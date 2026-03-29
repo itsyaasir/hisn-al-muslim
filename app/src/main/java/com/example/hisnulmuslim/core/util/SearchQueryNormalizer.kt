@@ -1,0 +1,9 @@
+package com.example.hisnulmuslim.core.util
+
+object SearchQueryNormalizer {
+    fun normalize(rawQuery: String): String {
+        return rawQuery
+            .trim()
+            .replace(Regex("\\s+"), " ")
+    }
+}

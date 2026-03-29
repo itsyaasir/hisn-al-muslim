@@ -1,0 +1,6 @@
+<resources>
+    <color name="ic_launcher_background">#D7E8DC</color>
+    <color name="icon_crescent_primary">#24403A</color>
+    <color name="icon_crescent_cutout">#D7E8DC</color>
+    <color name="icon_star">#F7D77E</color>
+</resources>
