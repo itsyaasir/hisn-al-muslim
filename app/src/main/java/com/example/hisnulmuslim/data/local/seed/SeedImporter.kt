@@ -19,11 +19,19 @@ class SeedImporter @Inject constructor(
         }
 
         val dataset = seedDataSource.loadDataset()
+        val collectionsById = dataset.collections.associateBy { it.id }
         database.withTransaction {
             val currentDhikr = database.dhikrDao().count()
             if (currentDhikr == 0) {
                 database.dhikrDao().insertAll(
-                    dataset.adhkar.mapIndexed { index, item -> item.toEntity(orderIndex = index + 1) },
+                    dataset.adhkar.map { item ->
+                        item.toEntity(
+                            collection = checkNotNull(collectionsById[item.collectionId]) {
+                                "Missing collection ${item.collectionId} for dhikr ${item.id}"
+                            },
+                            orderIndex = item.orderIndex,
+                        )
+                    },
                 )
                 database.seedStatusDao().upsert(
                     SeedStatusEntity(

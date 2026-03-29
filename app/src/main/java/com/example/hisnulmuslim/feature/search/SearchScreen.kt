@@ -43,6 +43,7 @@ import com.example.hisnulmuslim.core.designsystem.LocalAppFonts
 import com.example.hisnulmuslim.core.designsystem.appTopBarContainerColor
 import com.example.hisnulmuslim.core.designsystem.groupedTileContainerColor
 import com.example.hisnulmuslim.core.designsystem.mergePaddingValues
+import com.example.hisnulmuslim.core.model.Dhikr
 
 private val SearchTopRadius = 28.dp
 private val SearchInnerRadius = 8.dp
@@ -53,7 +54,7 @@ private val SearchPaneMaxWidth = 600.dp
 @Composable
 fun SearchScreen(
     contentPadding: PaddingValues,
-    onOpenDhikr: (Long) -> Unit,
+    onOpenDhikr: (Dhikr) -> Unit,
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -181,15 +182,15 @@ private fun SearchField(
 
 @Composable
 private fun SearchResultsGroup(
-    items: List<com.example.hisnulmuslim.core.model.Dhikr>,
-    onOpenDhikr: (Long) -> Unit,
+    items: List<Dhikr>,
+    onOpenDhikr: (Dhikr) -> Unit,
 ) {
     androidx.compose.foundation.layout.Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         items.forEachIndexed { index, item ->
             SearchResultTile(
                 dhikr = item,
                 shape = searchGroupShape(index, items.size),
-                onClick = { onOpenDhikr(item.id) },
+                onClick = { onOpenDhikr(item) },
             )
         }
     }
@@ -197,7 +198,7 @@ private fun SearchResultsGroup(
 
 @Composable
 private fun SearchResultTile(
-    dhikr: com.example.hisnulmuslim.core.model.Dhikr,
+    dhikr: Dhikr,
     shape: RoundedCornerShape,
     onClick: () -> Unit,
 ) {

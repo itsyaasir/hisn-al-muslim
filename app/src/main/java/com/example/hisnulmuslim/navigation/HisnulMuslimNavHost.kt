@@ -74,34 +74,55 @@ fun HisnulMuslimNavHost(
                         HomeScreen(
                             contentPadding = innerPadding,
                             onOpenSearch = { backStack.navigateToTopLevel(AppDestination.Search) },
-                            onOpenDhikr = { dhikrId ->
-                                backStack.add(AppDestination.DhikrDetail(dhikrId = dhikrId))
+                            onOpenCollection = { collection ->
+                                backStack.add(
+                                    AppDestination.DhikrDetail(
+                                        dhikrId = collection.firstDhikrId,
+                                        collectionId = collection.id,
+                                    ),
+                                )
+                            },
+                            onOpenDhikr = { dhikr ->
+                                backStack.add(
+                                    AppDestination.DhikrDetail(
+                                        dhikrId = dhikr.id,
+                                        collectionId = dhikr.collectionId,
+                                    ),
+                                )
                             },
                         )
                     }
                     entry<AppDestination.DhikrDetail> { destination ->
                         DhikrDetailScreen(
                             dhikrId = destination.dhikrId,
+                            collectionId = destination.collectionId,
                             contentPadding = innerPadding,
                             onBack = { backStack.onBack(activity::finish) },
-                            onOpenSibling = { dhikrId ->
-                                backStack.openSiblingDhikr(dhikrId)
-                            },
                         )
                     }
                     entry<AppDestination.Search> { _ ->
                         SearchScreen(
                             contentPadding = innerPadding,
-                            onOpenDhikr = { dhikrId ->
-                                backStack.add(AppDestination.DhikrDetail(dhikrId = dhikrId))
+                            onOpenDhikr = { dhikr ->
+                                backStack.add(
+                                    AppDestination.DhikrDetail(
+                                        dhikrId = dhikr.id,
+                                        collectionId = dhikr.collectionId,
+                                    ),
+                                )
                             },
                         )
                     }
                     entry<AppDestination.Favorites> { _ ->
                         FavoritesScreen(
                             contentPadding = innerPadding,
-                            onOpenDhikr = { dhikrId ->
-                                backStack.add(AppDestination.DhikrDetail(dhikrId = dhikrId))
+                            onOpenDhikr = { dhikr ->
+                                backStack.add(
+                                    AppDestination.DhikrDetail(
+                                        dhikrId = dhikr.id,
+                                        collectionId = dhikr.collectionId,
+                                    ),
+                                )
                             },
                         )
                     }
@@ -137,13 +158,4 @@ private fun MutableList<AppDestination>.navigateToTopLevel(destination: AppDesti
 
     if (size < 2) add(destination) else this[1] = destination
     if (size > 2) subList(2, size).clear()
-}
-
-private fun MutableList<AppDestination>.openSiblingDhikr(dhikrId: Long) {
-    val destination = AppDestination.DhikrDetail(dhikrId = dhikrId)
-    if (lastOrNull() is AppDestination.DhikrDetail) {
-        this[lastIndex] = destination
-    } else {
-        add(destination)
-    }
 }

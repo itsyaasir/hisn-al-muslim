@@ -19,7 +19,7 @@ import com.example.hisnulmuslim.data.local.entity.SeedStatusEntity
         ProgressEntity::class,
         SeedStatusEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(RoomConverters::class)

@@ -19,5 +19,6 @@ sealed interface AppDestination : NavKey {
     @Serializable
     data class DhikrDetail(
         val dhikrId: Long,
+        val collectionId: Long,
     ) : AppDestination
 }

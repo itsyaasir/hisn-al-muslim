@@ -31,12 +31,13 @@ import com.example.hisnulmuslim.core.designsystem.EmptyStateCard
 import com.example.hisnulmuslim.core.designsystem.LocalAppFonts
 import com.example.hisnulmuslim.core.designsystem.appTopBarContainerColor
 import com.example.hisnulmuslim.core.designsystem.mergePaddingValues
+import com.example.hisnulmuslim.core.model.Dhikr
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FavoritesScreen(
     contentPadding: PaddingValues,
-    onOpenDhikr: (Long) -> Unit,
+    onOpenDhikr: (Dhikr) -> Unit,
     viewModel: FavoritesViewModel = hiltViewModel(),
 ) {
     val favorites by viewModel.uiState.collectAsStateWithLifecycle()
@@ -107,7 +108,7 @@ fun FavoritesScreen(
                         androidx.compose.material3.ElevatedCard(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.extraLarge,
-                            onClick = { onOpenDhikr(item.id) },
+                            onClick = { onOpenDhikr(item) },
                         ) {
                             androidx.compose.foundation.layout.Column(
                                 modifier = Modifier.padding(20.dp),

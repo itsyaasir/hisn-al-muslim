@@ -56,6 +56,7 @@ import com.example.hisnulmuslim.core.designsystem.LocalAppFonts
 import com.example.hisnulmuslim.core.designsystem.appTopBarContainerColor
 import com.example.hisnulmuslim.core.designsystem.groupedTileContainerColor
 import com.example.hisnulmuslim.core.designsystem.mergePaddingValues
+import com.example.hisnulmuslim.core.model.Collection
 import com.example.hisnulmuslim.core.model.Dhikr
 
 private val HomeTopRadius = 28.dp
@@ -68,7 +69,8 @@ private val HomePaneMaxWidth = 600.dp
 fun HomeScreen(
     contentPadding: PaddingValues,
     onOpenSearch: () -> Unit,
-    onOpenDhikr: (Long) -> Unit,
+    onOpenCollection: (Collection) -> Unit,
+    onOpenDhikr: (Dhikr) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -77,6 +79,7 @@ fun HomeScreen(
         uiState = uiState,
         contentPadding = contentPadding,
         onOpenSearch = onOpenSearch,
+        onOpenCollection = onOpenCollection,
         onOpenDhikr = onOpenDhikr,
     )
 }
@@ -87,7 +90,8 @@ private fun HomeScreenContent(
     uiState: HomeUiState,
     contentPadding: PaddingValues,
     onOpenSearch: () -> Unit,
-    onOpenDhikr: (Long) -> Unit,
+    onOpenCollection: (Collection) -> Unit,
+    onOpenDhikr: (Dhikr) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val listState = rememberLazyListState()
@@ -171,24 +175,24 @@ private fun HomeScreenContent(
                             DailyReflectionTile(
                                 dhikr = dhikr,
                                 collapseProgress = collapseProgress,
-                                onClick = { onOpenDhikr(dhikr.id) },
+                                onClick = { onOpenDhikr(dhikr) },
                             )
                         }
                         item { Spacer(Modifier.height(12.dp)) }
                     }
 
-                    if (uiState.adhkar.isEmpty()) {
+                    if (uiState.collections.isEmpty()) {
                         item {
                             EmptyStateCard(
-                                title = "No adhkar yet",
-                                subtitle = "The local collection is still loading or needs to be seeded again.",
+                                title = "No collections yet",
+                                subtitle = "The local remembrance collection is still loading or needs to be seeded again.",
                             )
                         }
                     } else {
                         item {
-                            HomeDhikrGroup(
-                                items = uiState.adhkar,
-                                onOpenDhikr = onOpenDhikr,
+                            HomeCollectionGroup(
+                                items = uiState.collections,
+                                onOpenCollection = onOpenCollection,
                             )
                         }
                     }
@@ -274,24 +278,24 @@ private fun DailyReflectionTile(
 }
 
 @Composable
-private fun HomeDhikrGroup(
-    items: List<Dhikr>,
-    onOpenDhikr: (Long) -> Unit,
+private fun HomeCollectionGroup(
+    items: List<Collection>,
+    onOpenCollection: (Collection) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         items.forEachIndexed { index, item ->
-            HomeDhikrTile(
-                dhikr = item,
+            HomeCollectionTile(
+                collection = item,
                 shape = homeGroupShape(index, items.size),
-                onClick = { onOpenDhikr(item.id) },
+                onClick = { onOpenCollection(item) },
             )
         }
     }
 }
 
 @Composable
-private fun HomeDhikrTile(
-    dhikr: Dhikr,
+private fun HomeCollectionTile(
+    collection: Collection,
     shape: RoundedCornerShape,
     onClick: () -> Unit,
 ) {
@@ -315,7 +319,7 @@ private fun HomeDhikrTile(
                 verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
                 Text(
-                    text = dhikr.title,
+                    text = collection.title,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                 )
@@ -356,59 +360,44 @@ private fun HomeScreenPreview() {
     HisnulMuslimTheme(settings = com.example.hisnulmuslim.core.model.AppSettings()) {
         HomeScreenContent(
             uiState = HomeUiState(
-                adhkar = listOf(
-                    Dhikr(
+                collections = listOf(
+                    Collection(
                         id = 1,
-                        title = "Morning remembrance",
-                        arabicText = "اللهم بك أصبحنا",
-                        transliteration = "Allahumma bika asbahna",
-                        translation = "O Allah, by You we enter the morning.",
-                        repeatCount = 1,
-                        notes = null,
-                        sourceReference = "Abu Dawud",
+                        title = "Entering the morning",
+                        subtitle = "Morning remembrance",
                         orderIndex = 1,
-                        tags = listOf("morning"),
+                        firstDhikrId = 1,
+                        itemCount = 2,
                     ),
-                    Dhikr(
+                    Collection(
                         id = 2,
-                        title = "Protection in the morning",
-                        arabicText = "بسم الله الذي لا يضر",
-                        transliteration = null,
-                        translation = "In the name of Allah, with whose name nothing can cause harm.",
-                        repeatCount = 3,
-                        notes = null,
-                        sourceReference = "Tirmidhi",
+                        title = "Entering the evening",
+                        subtitle = "Evening remembrance",
                         orderIndex = 2,
-                        tags = listOf("protection"),
-                    ),
-                    Dhikr(
-                        id = 3,
-                        title = "Evening remembrance",
-                        arabicText = "أمسينا وأمسى الملك لله",
-                        transliteration = null,
-                        translation = "We enter the evening and all dominion belongs to Allah.",
-                        repeatCount = 1,
-                        notes = null,
-                        sourceReference = "Muslim",
-                        orderIndex = 1,
-                        tags = listOf("evening"),
+                        firstDhikrId = 3,
+                        itemCount = 1,
                     ),
                 ),
                 dailyHighlight = Dhikr(
-                    id = 2,
-                    title = "Protection in the morning",
-                    arabicText = "بسم الله الذي لا يضر",
-                    transliteration = null,
-                    translation = "In the name of Allah, with whose name nothing can cause harm.",
-                    repeatCount = 3,
+                    id = 1,
+                    collectionId = 1,
+                    collectionTitle = "Entering the morning",
+                    collectionSubtitle = "Morning remembrance",
+                    collectionOrderIndex = 1,
+                    title = "Morning remembrance",
+                    arabicText = "اللهم بك أصبحنا",
+                    transliteration = "Allahumma bika asbahna",
+                    translation = "O Allah, by You we enter the morning.",
+                    repeatCount = 1,
                     notes = null,
-                    sourceReference = "Tirmidhi",
-                    orderIndex = 2,
-                    tags = listOf("protection"),
+                    sourceReference = "Abu Dawud",
+                    orderIndex = 1,
+                    tags = listOf("morning"),
                 ),
             ),
             contentPadding = PaddingValues(),
             onOpenSearch = {},
+            onOpenCollection = {},
             onOpenDhikr = {},
         )
     }

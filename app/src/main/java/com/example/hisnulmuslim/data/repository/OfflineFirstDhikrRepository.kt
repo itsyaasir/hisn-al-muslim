@@ -1,5 +1,6 @@
 package com.example.hisnulmuslim.data.repository
 
+import com.example.hisnulmuslim.core.model.Collection
 import com.example.hisnulmuslim.core.model.Dhikr
 import com.example.hisnulmuslim.core.model.DhikrProgress
 import com.example.hisnulmuslim.core.util.SearchQueryNormalizer
@@ -23,12 +24,16 @@ class OfflineFirstDhikrRepository @Inject constructor(
     private val timeProvider: TimeProvider,
 ) : DhikrRepository {
 
-    override fun observeAllDhikrOrdered(): Flow<List<Dhikr>> {
-        return dhikrDao.observeAllOrdered().map { items -> items.map { it.toModel() } }
+    override fun observeCollections(): Flow<List<Collection>> {
+        return dhikrDao.observeCollections().map { items -> items.map { it.toModel() } }
     }
 
-    override fun observeDhikrDetail(dhikrId: Long): Flow<Dhikr?> {
-        return dhikrDao.observeDetail(dhikrId).map { it?.toModel() }
+    override fun observeCollectionDhikr(collectionId: Long): Flow<List<Dhikr>> {
+        return dhikrDao.observeCollectionDhikr(collectionId).map { items -> items.map { it.toModel() } }
+    }
+
+    override fun observeAllDhikrOrdered(): Flow<List<Dhikr>> {
+        return dhikrDao.observeAllOrdered().map { items -> items.map { it.toModel() } }
     }
 
     override fun observeFavorites(): Flow<List<Dhikr>> {

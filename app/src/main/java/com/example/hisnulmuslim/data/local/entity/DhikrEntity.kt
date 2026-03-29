@@ -6,6 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "adhkar")
 data class DhikrEntity(
     @PrimaryKey val id: Long,
+    val collectionId: Long,
+    val collectionTitle: String,
+    val collectionSubtitle: String?,
+    val collectionOrderIndex: Int,
     val title: String,
     val arabicText: String,
     val transliteration: String?,

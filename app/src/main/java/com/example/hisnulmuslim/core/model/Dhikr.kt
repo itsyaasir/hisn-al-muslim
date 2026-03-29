@@ -2,6 +2,10 @@ package com.example.hisnulmuslim.core.model
 
 data class Dhikr(
     val id: Long,
+    val collectionId: Long,
+    val collectionTitle: String,
+    val collectionSubtitle: String?,
+    val collectionOrderIndex: Int,
     val title: String,
     val arabicText: String,
     val transliteration: String?,

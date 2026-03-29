@@ -20,13 +20,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class DhikrDetailUiState(
-    val dhikr: Dhikr? = null,
+    val collectionDhikr: List<Dhikr> = emptyList(),
+    val currentIndex: Int = 0,
     val isFavorite: Boolean = false,
     val progress: DhikrProgress? = null,
     val settings: AppSettings = AppSettings(),
-    val previousDhikrId: Long? = null,
-    val nextDhikrId: Long? = null,
 ) {
+    val dhikr: Dhikr? get() = collectionDhikr.getOrNull(currentIndex)
+    val currentDhikrId: Long? get() = dhikr?.id
+    val showsCollectionDots: Boolean get() = collectionDhikr.size > 1
     val currentCount: Int get() = progress?.currentCount ?: 0
     val completedCount: Int get() = progress?.completedCount ?: 0
     val repeatTarget: Int? get() = dhikr?.repeatCount
@@ -50,37 +52,48 @@ class DhikrDetailViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
     private val dhikrId = MutableStateFlow<Long?>(null)
+    private val collectionId = MutableStateFlow<Long?>(null)
 
-    val uiState: StateFlow<DhikrDetailUiState> = dhikrId
-        .flatMapLatest { currentDhikrId ->
-            if (currentDhikrId == null) {
-                flowOf(DhikrDetailUiState())
+    val uiState: StateFlow<DhikrDetailUiState> = combine(
+        collectionId.flatMapLatest { currentCollectionId ->
+            if (currentCollectionId == null) {
+                flowOf(emptyList())
             } else {
-                combine(
-                    repository.observeDhikrDetail(currentDhikrId),
-                    repository.observeIsFavorite(currentDhikrId),
-                    repository.observeProgress(currentDhikrId),
-                    settingsRepository.observeSettings(),
-                    repository.observeAllDhikrOrdered(),
-                ) { dhikr, isFavorite, progress, settings, orderedDhikr ->
-                    val currentIndex = orderedDhikr.indexOfFirst { it.id == currentDhikrId }
-                    DhikrDetailUiState(
-                        dhikr = dhikr,
-                        isFavorite = isFavorite,
-                        progress = progress,
-                        settings = settings,
-                        previousDhikrId = orderedDhikr.getOrNull(currentIndex - 1)?.id,
-                        nextDhikrId = orderedDhikr.getOrNull(currentIndex + 1)?.id,
-                    )
-                }
+                repository.observeCollectionDhikr(currentCollectionId)
             }
-        }.stateIn(
+        },
+        dhikrId,
+        dhikrId.flatMapLatest { currentDhikrId ->
+            if (currentDhikrId == null) flowOf(false) else repository.observeIsFavorite(currentDhikrId)
+        },
+        dhikrId.flatMapLatest { currentDhikrId ->
+            if (currentDhikrId == null) flowOf(null) else repository.observeProgress(currentDhikrId)
+        },
+        settingsRepository.observeSettings(),
+    ) { collectionDhikr, currentDhikrId, isFavorite, progress, settings ->
+        val currentIndex = collectionDhikr.indexOfFirst { it.id == currentDhikrId }
+            .takeIf { it >= 0 }
+            ?: 0
+        DhikrDetailUiState(
+            collectionDhikr = collectionDhikr,
+            currentIndex = currentIndex,
+            isFavorite = isFavorite,
+            progress = progress,
+            settings = settings,
+        )
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = DhikrDetailUiState(),
     )
 
-    fun bind(dhikrId: Long) {
+    fun bind(dhikrId: Long, collectionId: Long) {
+        if (this.dhikrId.value == dhikrId && this.collectionId.value == collectionId) return
+        this.collectionId.value = collectionId
+        this.dhikrId.value = dhikrId
+    }
+
+    fun selectDhikr(dhikrId: Long) {
         if (this.dhikrId.value == dhikrId) return
         this.dhikrId.value = dhikrId
     }
@@ -108,7 +121,7 @@ class DhikrDetailViewModel @Inject constructor(
             state.completedCount
         }
 
-        val dhikrId = dhikrId.value ?: return
+        val dhikrId = state.currentDhikrId ?: return
         viewModelScope.launch {
             repository.updateProgress(
                 dhikrId = dhikrId,
@@ -122,7 +135,7 @@ class DhikrDetailViewModel @Inject constructor(
         val state = uiState.value
         if (!state.showsCounterHero) return
         if (state.currentCount == 0 && state.completedCount == 0) return
-        val dhikrId = dhikrId.value ?: return
+        val dhikrId = state.currentDhikrId ?: return
         viewModelScope.launch {
             repository.updateProgress(
                 dhikrId = dhikrId,

@@ -2,6 +2,7 @@ package com.example.hisnulmuslim.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hisnulmuslim.core.model.Collection
 import com.example.hisnulmuslim.core.model.Dhikr
 import com.example.hisnulmuslim.data.repository.DhikrRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,9 +13,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 data class HomeUiState(
-    val adhkar: List<Dhikr> = emptyList(),
+    val collections: List<Collection> = emptyList(),
     val dailyHighlight: Dhikr? = null,
-) 
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -22,11 +23,11 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState> = combine(
-        repository.observeAllDhikrOrdered(),
+        repository.observeCollections(),
         repository.observeDailyHighlight(),
-    ) { adhkar, dailyHighlight ->
+    ) { collections, dailyHighlight ->
         HomeUiState(
-            adhkar = adhkar,
+            collections = collections,
             dailyHighlight = dailyHighlight,
         )
     }.stateIn(
