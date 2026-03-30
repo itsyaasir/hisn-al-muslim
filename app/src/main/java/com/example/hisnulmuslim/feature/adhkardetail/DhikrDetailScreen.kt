@@ -367,21 +367,22 @@ fun DhikrDetailScreen(
                                 ) {
                                     Text(
                                         text = "Reference",
-                                        style = MaterialTheme.typography.titleMedium,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.secondary,
                                     )
                                     pageDhikr.sourceReference?.let {
                                         Text(
                                             text = it,
-                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                            style = MaterialTheme.typography.bodySmall.copy(
                                                 fontStyle = FontStyle.Italic,
                                             ),
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.86f),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
                                         )
                                     }
                                     pageDhikr.notes?.let {
                                         Text(
                                             text = it,
-                                            style = MaterialTheme.typography.bodyMedium,
+                                            style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
