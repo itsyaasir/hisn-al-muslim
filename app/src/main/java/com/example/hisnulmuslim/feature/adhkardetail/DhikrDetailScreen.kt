@@ -2,17 +2,21 @@ package com.example.hisnulmuslim.feature.adhkardetail
 
 import android.content.ClipData
 import android.content.Intent
+import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,12 +28,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Bookmark
@@ -51,9 +56,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
@@ -68,6 +76,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -83,6 +92,7 @@ import com.example.hisnulmuslim.core.designsystem.LocalMotionPreferences
 import com.example.hisnulmuslim.core.designsystem.mergePaddingValues
 import com.example.hisnulmuslim.core.model.Dhikr
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -100,17 +110,34 @@ fun DhikrDetailScreen(
         )
     }
 
+    val activity = LocalActivity.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val topBarTitleFont = LocalAppFonts.current.topBarTitle
+    val appFonts = LocalAppFonts.current
+    val topBarTitleFont = appFonts.topBarTitle
+    val arabicFont = appFonts.arabic
     val layoutDirection = LocalLayoutDirection.current
     val expressiveShapes = LocalExpressiveShapes.current
     val motionPreferences = LocalMotionPreferences.current
     val pagerState = rememberPagerState(pageCount = { uiState.collectionDhikr.size })
+    val pageScrollStates = remember(uiState.collectionDhikr.size) { mutableStateMapOf<Int, ScrollState>() }
     val headerTitle = uiState.dhikr?.collectionTitle.orEmpty()
+    val currentPageScroll = pageScrollStates[pagerState.currentPage]?.value ?: 0
+    val collapseProgress by animateFloatAsState(
+        targetValue = (currentPageScroll / 144f).coerceIn(0f, 1f),
+        animationSpec = motionPreferences.expressiveFastEffect(),
+        label = "detailHeaderCollapseProgress",
+    )
+
+    DisposableEffect(viewModel, collectionId, activity) {
+        onDispose {
+            if (activity?.isChangingConfigurations == true) return@onDispose
+            viewModel.clearCollectionProgress(collectionId)
+        }
+    }
 
     LaunchedEffect(uiState.currentIndex, uiState.collectionDhikr.size) {
         if (uiState.collectionDhikr.isEmpty()) return@LaunchedEffect
@@ -130,7 +157,7 @@ fun DhikrDetailScreen(
 
     val screenInsets = contentPadding
     val pageInsets = mergePaddingValues(
-        PaddingValues(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 124.dp),
+        PaddingValues(start = 20.dp, top = 28.dp, end = 20.dp, bottom = 124.dp),
         PaddingValues(bottom = contentPadding.calculateBottomPadding()),
         layoutDirection,
     )
@@ -186,6 +213,12 @@ fun DhikrDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .widthIn(max = 900.dp)
+                        .graphicsLayer {
+                            alpha = lerpFloat(1f, 0.94f, collapseProgress)
+                            scaleX = lerpFloat(1f, 0.985f, collapseProgress)
+                            scaleY = lerpFloat(1f, 0.985f, collapseProgress)
+                            translationY = lerpFloat(0f, (-8).dp.toPx(), collapseProgress)
+                        }
                         .padding(
                             start = 20.dp,
                             top = contentPadding.calculateTopPadding() + 16.dp,
@@ -198,10 +231,14 @@ fun DhikrDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .graphicsLayer {
+                            alpha = lerpFloat(1f, 0.72f, collapseProgress)
+                            translationY = lerpFloat(0f, (-10).dp.toPx(), collapseProgress)
+                        }
+                        .padding(top = 8.dp, bottom = 14.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CollectionDotsIndicator(
+                    CollectionProgressIndicator(
                         count = uiState.collectionDhikr.size,
                         selectedIndex = uiState.currentIndex,
                     )
@@ -213,39 +250,60 @@ fun DhikrDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
+                flingBehavior = PagerDefaults.flingBehavior(
+                    state = pagerState,
+                    snapAnimationSpec = motionPreferences.expressiveSpatial(),
+                    snapPositionalThreshold = 0.42f,
+                ),
                 userScrollEnabled = uiState.collectionDhikr.size > 1,
                 beyondViewportPageCount = 0,
             ) { page ->
                 val pageDhikr = uiState.collectionDhikr[page]
-                val isActivePage = pageDhikr.id == uiState.currentDhikrId
+                val pageScrollState = pageScrollStates.getOrPut(page) { ScrollState(0) }
+                val rawOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
+                val pageOffset = rawOffset.absoluteValue.coerceIn(0f, 1f)
+                val pageScale = lerpFloat(start = 0.972f, stop = 1f, fraction = 1f - pageOffset)
+                val pageAlpha = lerpFloat(start = 0.94f, stop = 1f, fraction = 1f - pageOffset)
+                val pageTranslation = lerpFloat(
+                    start = 40f,
+                    stop = 0f,
+                    fraction = 1f - pageOffset,
+                ) * rawOffset
 
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                            alpha = pageAlpha
+                            scaleX = pageScale
+                            scaleY = pageScale
+                            translationX = pageTranslation
+                        },
                     contentAlignment = Alignment.TopCenter,
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .widthIn(max = 900.dp)
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(pageScrollState)
                             .padding(pageInsets),
                         verticalArrangement = Arrangement.spacedBy(20.dp),
                     ) {
-                        ElevatedCard(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .animateContentSize(motionPreferences.expressiveSpatial()),
-                            shape = expressiveShapes.heroCard,
-                            colors = CardDefaults.elevatedCardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            ),
+                            verticalArrangement = Arrangement.spacedBy(28.dp),
                         ) {
                             Column(
-                                modifier = Modifier.padding(24.dp),
-                                verticalArrangement = Arrangement.spacedBy(14.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .widthIn(max = 760.dp)
+                                    .align(Alignment.CenterHorizontally),
+                                verticalArrangement = Arrangement.spacedBy(20.dp),
                             ) {
-                                androidx.compose.runtime.CompositionLocalProvider(
-                                    androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Rtl,
+                                CompositionLocalProvider(
+                                    LocalLayoutDirection provides LayoutDirection.Rtl,
                                 ) {
                                     SelectionContainer {
                                         Text(
@@ -253,38 +311,43 @@ fun DhikrDetailScreen(
                                             modifier = Modifier.fillMaxWidth(),
                                             textAlign = TextAlign.Center,
                                             style = TextStyle(
-                                                fontFamily = FontFamily.Serif,
-                                                fontSize = (28.sp * uiState.settings.arabicFontScale),
-                                                lineHeight = (48.sp * uiState.settings.arabicFontScale),
-                                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                fontFamily = arabicFont,
+                                                fontSize = (30.sp * uiState.settings.arabicFontScale),
+                                                lineHeight = (54.sp * uiState.settings.arabicFontScale),
+                                                color = MaterialTheme.colorScheme.onSurface,
                                             ),
                                         )
                                     }
                                 }
-                                AnimatedVisibility(
-                                    visible = uiState.settings.showTransliteration && !pageDhikr.transliteration.isNullOrBlank(),
-                                ) {
-                                    Text(
-                                        text = pageDhikr.transliteration.orEmpty(),
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * uiState.settings.transliterationFontScale,
-                                            lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * uiState.settings.transliterationFontScale,
-                                        ),
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.82f),
-                                    )
-                                }
-                                AnimatedVisibility(
-                                    visible = uiState.settings.showTranslation && !pageDhikr.translation.isNullOrBlank(),
-                                ) {
-                                    Text(
-                                        text = pageDhikr.translation.orEmpty(),
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * uiState.settings.translationFontScale,
-                                            lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * uiState.settings.translationFontScale,
-                                        ),
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.92f),
-                                    )
-                                }
+                            }
+                            AnimatedVisibility(
+                                visible = uiState.settings.showTransliteration && !pageDhikr.transliteration.isNullOrBlank(),
+                            ) {
+                                DetailSupportingTextSection(
+                                    label = "Transliteration",
+                                    labelColor = MaterialTheme.colorScheme.secondary,
+                                    text = pageDhikr.transliteration.orEmpty(),
+                                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                        fontStyle = FontStyle.Italic,
+                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize * uiState.settings.transliterationFontScale,
+                                        lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * uiState.settings.transliterationFontScale,
+                                    ),
+                                    textColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.96f),
+                                )
+                            }
+                            AnimatedVisibility(
+                                visible = uiState.settings.showTranslation && !pageDhikr.translation.isNullOrBlank(),
+                            ) {
+                                DetailSupportingTextSection(
+                                    label = "Translation",
+                                    labelColor = MaterialTheme.colorScheme.secondary,
+                                    text = pageDhikr.translation.orEmpty(),
+                                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize * uiState.settings.translationFontScale,
+                                        lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * uiState.settings.translationFontScale,
+                                    ),
+                                    textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
+                                )
                             }
                         }
 
@@ -292,6 +355,9 @@ fun DhikrDetailScreen(
                             ElevatedCard(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = expressiveShapes.actionCard,
+                                colors = CardDefaults.elevatedCardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                                ),
                             ) {
                                 Column(
                                     modifier = Modifier.padding(20.dp),
@@ -324,7 +390,8 @@ fun DhikrDetailScreen(
 
         DetailFloatingActions(
             showsCounterHero = uiState.showsCounterHero,
-            uiState = uiState,
+            remainingCount = uiState.remainingCount,
+            isCounterRoundComplete = uiState.isCounterRoundComplete,
             screenInsets = screenInsets,
             onCount = {
                 if (uiState.isCounterRoundComplete) {
@@ -458,16 +525,40 @@ private fun CollectionDotsIndicator(
 }
 
 @Composable
+private fun CollectionProgressIndicator(
+    count: Int,
+    selectedIndex: Int,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(
+            text = "${selectedIndex + 1} of $count",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        CollectionDotsIndicator(
+            count = count,
+            selectedIndex = selectedIndex,
+        )
+    }
+}
+
+@Composable
 private fun BoxScope.DetailFloatingActions(
     showsCounterHero: Boolean,
-    uiState: DhikrDetailUiState,
+    remainingCount: Int?,
+    isCounterRoundComplete: Boolean,
     screenInsets: PaddingValues,
     onCount: () -> Unit,
 ) {
     if (!showsCounterHero) return
 
     DhikrCounterFab(
-        uiState = uiState,
+        remaining = remainingCount ?: return,
+        isComplete = isCounterRoundComplete,
         onClick = onCount,
         modifier = Modifier
             .align(Alignment.BottomEnd)
@@ -478,18 +569,17 @@ private fun BoxScope.DetailFloatingActions(
 
 @Composable
 private fun DhikrCounterFab(
-    uiState: DhikrDetailUiState,
+    remaining: Int,
+    isComplete: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val motionPreferences = LocalMotionPreferences.current
-    val isComplete = uiState.isCounterRoundComplete
-    val remaining = uiState.remainingCount ?: return
     val containerColor by animateColorAsState(
         targetValue = if (isComplete) {
             MaterialTheme.colorScheme.tertiaryContainer
         } else {
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.secondaryContainer
         },
         animationSpec = motionPreferences.expressiveFastEffect(),
         label = "counterFabContainerColor",
@@ -503,6 +593,15 @@ private fun DhikrCounterFab(
         animationSpec = motionPreferences.expressiveFastEffect(),
         label = "counterFabContentColor",
     )
+    val borderColor by animateColorAsState(
+        targetValue = if (isComplete) {
+            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.35f)
+        } else {
+            MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+        },
+        animationSpec = motionPreferences.expressiveFastEffect(),
+        label = "counterFabBorderColor",
+    )
     val scale by animateFloatAsState(
         targetValue = if (isComplete) 1.06f else 1f,
         animationSpec = motionPreferences.expressiveSpatial(),
@@ -513,6 +612,11 @@ private fun DhikrCounterFab(
         onClick = onClick,
         modifier = modifier
             .size(72.dp)
+            .border(
+                width = 1.dp,
+                color = borderColor,
+                shape = RoundedCornerShape(28.dp),
+            )
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -566,4 +670,39 @@ private fun formatShareText(dhikr: Dhikr): String {
             appendLine("Reference: $it")
         }
     }.trim()
+}
+
+@Composable
+private fun ColumnScope.DetailSupportingTextSection(
+    label: String,
+    labelColor: androidx.compose.ui.graphics.Color,
+    text: String,
+    textStyle: TextStyle,
+    textColor: androidx.compose.ui.graphics.Color,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .widthIn(max = 700.dp)
+            .align(Alignment.CenterHorizontally),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = labelColor,
+        )
+        Text(
+            text = text,
+            style = textStyle,
+            color = textColor,
+        )
+    }
+}
+
+private fun lerpFloat(start: Float, stop: Float, fraction: Float): Float {
+    return start + ((stop - start) * fraction)
 }

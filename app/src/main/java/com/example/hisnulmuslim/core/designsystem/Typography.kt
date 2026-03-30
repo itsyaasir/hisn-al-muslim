@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import com.example.hisnulmuslim.R
+import com.example.hisnulmuslim.core.model.ArabicFontFamily
 
 private val BaseTypography = Typography()
 
@@ -32,6 +33,18 @@ private val GoogleFlex600 = FontFamily(
             FontVariation.Setting("ROND", 100f),
         ),
     ),
+)
+
+private val AmiriArabic = FontFamily(
+    Font(R.font.amiri_regular),
+)
+
+private val NotoNaskhArabic = FontFamily(
+    Font(R.font.noto_naskh_arabic_regular),
+)
+
+private val ScheherazadeArabic = FontFamily(
+    Font(R.font.scheherazade_new_regular),
 )
 
 val HisnulMuslimTypography = Typography(
@@ -100,6 +113,7 @@ val HisnulMuslimTypography = Typography(
 data class AppFonts(
     val topBarTitle: FontFamily,
     val annotatedString: FontFamily,
+    val arabic: FontFamily,
 )
 
 val HisnulMuslimAppFonts = AppFonts(
@@ -130,6 +144,17 @@ val HisnulMuslimAppFonts = AppFonts(
             ),
         ),
     ),
+    arabic = AmiriArabic,
 )
 
 val LocalAppFonts = staticCompositionLocalOf { HisnulMuslimAppFonts }
+
+fun appFontsFor(arabicFontFamily: ArabicFontFamily): AppFonts {
+    return HisnulMuslimAppFonts.copy(
+        arabic = when (arabicFontFamily) {
+            ArabicFontFamily.AMIRI -> AmiriArabic
+            ArabicFontFamily.NOTO_NASKH -> NotoNaskhArabic
+            ArabicFontFamily.SCHEHERAZADE -> ScheherazadeArabic
+        },
+    )
+}

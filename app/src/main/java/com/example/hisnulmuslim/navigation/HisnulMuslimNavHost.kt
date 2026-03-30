@@ -1,6 +1,7 @@
 package com.example.hisnulmuslim.navigation
 
 import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -29,7 +29,7 @@ import com.example.hisnulmuslim.feature.settings.SettingsScreen
 fun HisnulMuslimNavHost(
     modifier: Modifier = Modifier,
 ) {
-    val activity = LocalContext.current as Activity
+    val activity = checkNotNull(LocalActivity.current)
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current)
     val motionPreferences = LocalMotionPreferences.current
     @Suppress("UNCHECKED_CAST")

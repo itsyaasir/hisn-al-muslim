@@ -91,7 +91,11 @@ class OfflineFirstDhikrRepository @Inject constructor(
         )
     }
 
-    override suspend fun resetProgress() {
-        progressDao.deleteAll()
+    override suspend fun clearCollectionProgress(collectionId: Long) {
+        progressDao.deleteByCollectionId(collectionId)
+    }
+
+    override suspend fun clearFavorites() {
+        favoriteDao.deleteAll()
     }
 }

@@ -3,6 +3,7 @@ package com.example.hisnulmuslim.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hisnulmuslim.core.model.AppSettings
+import com.example.hisnulmuslim.core.model.ArabicFontFamily
 import com.example.hisnulmuslim.core.model.DefaultThemeSeedColor
 import com.example.hisnulmuslim.core.model.ThemeMode
 import com.example.hisnulmuslim.data.repository.DhikrRepository
@@ -54,6 +55,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { repository.setFontScale(scale) }
     }
 
+    fun setArabicFontFamily(fontFamily: ArabicFontFamily) {
+        viewModelScope.launch { repository.setArabicFontFamily(fontFamily) }
+    }
+
     fun setArabicFontScale(scale: Float) {
         viewModelScope.launch { repository.setArabicFontScale(scale) }
     }
@@ -78,7 +83,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { repository.setShowReference(visible) }
     }
 
-    fun resetProgress() {
-        viewModelScope.launch { dhikrRepository.resetProgress() }
+    fun clearFavorites() {
+        viewModelScope.launch { dhikrRepository.clearFavorites() }
     }
 }

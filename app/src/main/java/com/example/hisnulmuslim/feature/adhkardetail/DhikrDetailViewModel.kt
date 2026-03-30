@@ -144,4 +144,10 @@ class DhikrDetailViewModel @Inject constructor(
             )
         }
     }
+
+    fun clearCollectionProgress(collectionId: Long) {
+        viewModelScope.launch {
+            repository.clearCollectionProgress(collectionId)
+        }
+    }
 }

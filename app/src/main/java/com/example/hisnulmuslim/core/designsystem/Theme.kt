@@ -102,6 +102,7 @@ fun HisnulMuslimTheme(
     val density = LocalDensity.current
     val view = LocalView.current
     val motionPreferences = rememberMotionPreferences()
+    val appFonts = appFontsFor(settings.arabicFontFamily)
     val useDarkTheme = when (settings.themeMode) {
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
         ThemeMode.LIGHT -> false
@@ -150,7 +151,7 @@ fun HisnulMuslimTheme(
     }
 
     CompositionLocalProvider(
-        LocalAppFonts provides HisnulMuslimAppFonts,
+        LocalAppFonts provides appFonts,
         LocalBlackTheme provides useBlackTheme,
         LocalExpressiveShapes provides ExpressiveShapes(),
         LocalMotionPreferences provides motionPreferences,

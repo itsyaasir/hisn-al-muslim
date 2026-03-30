@@ -33,12 +33,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
-import androidx.compose.material.icons.outlined.RestartAlt
-import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material.icons.outlined.Visibility
@@ -49,6 +47,7 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -56,6 +55,7 @@ import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -87,6 +87,7 @@ import com.example.hisnulmuslim.core.designsystem.appTopBarContainerColor
 import com.example.hisnulmuslim.core.designsystem.detailTopBarContainerColor
 import com.example.hisnulmuslim.core.designsystem.groupedTileContainerColor
 import com.example.hisnulmuslim.core.designsystem.LocalAppFonts
+import com.example.hisnulmuslim.core.model.ArabicFontFamily
 import com.example.hisnulmuslim.core.model.AppSettings
 import com.example.hisnulmuslim.core.model.DefaultThemeSeedColor
 import com.example.hisnulmuslim.core.model.ThemeMode
@@ -164,7 +165,7 @@ fun SettingsScreen(
             onOpenReading = { currentPage = SettingsPage.Reading },
             onOpenLanguage = { showLocaleSheet = true },
             onOpenAbout = { currentPage = SettingsPage.About },
-            onResetProgress = viewModel::resetProgress,
+            onResetFavorites = viewModel::clearFavorites,
         )
 
         SettingsPage.Appearance -> SettingsAppearancePage(
@@ -182,6 +183,7 @@ fun SettingsScreen(
             settings = settings,
             onBack = { currentPage = SettingsPage.Main },
             onFontScaleChange = viewModel::setFontScale,
+            onArabicFontFamilyChange = viewModel::setArabicFontFamily,
             onArabicFontScaleChange = viewModel::setArabicFontScale,
             onTransliterationFontScaleChange = viewModel::setTransliterationFontScale,
             onTranslationFontScaleChange = viewModel::setTranslationFontScale,
@@ -209,8 +211,12 @@ private fun SettingsMainPage(
     onOpenReading: () -> Unit,
     onOpenLanguage: () -> Unit,
     onOpenAbout: () -> Unit,
-    onResetProgress: () -> Unit,
+    onResetFavorites: () -> Unit,
 ) {
+    var showResetFavoritesDialog by rememberSaveable { mutableStateOf(false) }
+    val hasLanguageTile = localeLabel != null
+    val appGroupCount = if (hasLanguageTile) 2 else 1
+
     SettingsPageScaffold(
         contentPadding = contentPadding,
         title = "Settings",
@@ -241,7 +247,7 @@ private fun SettingsMainPage(
 
         item {
             SettingsGroup {
-                if (localeLabel != null) {
+                if (hasLanguageTile) {
                     SettingsNavigationTile(
                         shape = settingsGroupShape(0, 2),
                         icon = {
@@ -254,40 +260,56 @@ private fun SettingsMainPage(
                         subtitle = localeLabel,
                         onClick = onOpenLanguage,
                     )
-                    SettingsNavigationTile(
-                        shape = settingsGroupShape(1, 2),
-                        icon = { SettingsIcon(Icons.Outlined.Info) },
-                        title = "About",
-                        subtitle = "Version $versionLabel",
-                        onClick = onOpenAbout,
-                    )
-                } else {
-                    SettingsNavigationTile(
-                        shape = settingsGroupShape(0, 1),
-                        icon = { SettingsIcon(Icons.Outlined.Info) },
-                        title = "About",
-                        subtitle = "Version $versionLabel",
-                        onClick = onOpenAbout,
-                    )
                 }
+                SettingsNavigationTile(
+                    shape = settingsGroupShape(appGroupCount - 1, appGroupCount),
+                    icon = { SettingsIcon(Icons.Outlined.Info) },
+                    title = "About",
+                    subtitle = "Version $versionLabel",
+                    onClick = onOpenAbout,
+                )
             }
         }
 
         item { Spacer(Modifier.height(12.dp)) }
 
         item {
-            SettingsGroup {
-                SettingsActionTile(
-                    shape = settingsGroupShape(0, 1),
-                    icon = { SettingsIcon(Icons.Outlined.RestartAlt) },
-                    title = "Reset progress",
-                    subtitle = "Clear counters and completion history",
-                    onClick = onResetProgress,
-                )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                TextButton(onClick = { showResetFavoritesDialog = true }) {
+                    Text("Reset Favorites")
+                }
             }
         }
 
         item { Spacer(Modifier.height(24.dp)) }
+    }
+
+    if (showResetFavoritesDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetFavoritesDialog = false },
+            title = { Text("Reset Favorites") },
+            text = {
+                Text("Are you sure you want to clear all saved favorites?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showResetFavoritesDialog = false
+                        onResetFavorites()
+                    },
+                ) {
+                    Text("Reset")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetFavoritesDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+        )
     }
 }
 
@@ -366,6 +388,7 @@ private fun SettingsReadingPage(
     settings: AppSettings,
     onBack: () -> Unit,
     onFontScaleChange: (Float) -> Unit,
+    onArabicFontFamilyChange: (ArabicFontFamily) -> Unit,
     onArabicFontScaleChange: (Float) -> Unit,
     onTransliterationFontScaleChange: (Float) -> Unit,
     onTranslationFontScaleChange: (Float) -> Unit,
@@ -373,6 +396,16 @@ private fun SettingsReadingPage(
     onShowTranslationChange: (Boolean) -> Unit,
     onShowReferenceChange: (Boolean) -> Unit,
 ) {
+    var showArabicFontSheet by rememberSaveable { mutableStateOf(false) }
+
+    if (showArabicFontSheet) {
+        SettingsArabicFontBottomSheet(
+            selectedFont = settings.arabicFontFamily,
+            onFontSelected = onArabicFontFamilyChange,
+            setShowSheet = { showArabicFontSheet = it },
+        )
+    }
+
     SettingsPageScaffold(
         contentPadding = contentPadding,
         title = "Reading",
@@ -414,8 +447,15 @@ private fun SettingsReadingPage(
 
         item {
             SettingsGroup {
+                SettingsNavigationTile(
+                    shape = settingsGroupShape(0, 5),
+                    icon = { SettingsIcon(Icons.AutoMirrored.Outlined.MenuBook) },
+                    title = "Arabic font",
+                    subtitle = settings.arabicFontFamily.label(),
+                    onClick = { showArabicFontSheet = true },
+                )
                 SettingsSliderTile(
-                    shape = settingsGroupShape(0, 4),
+                    shape = settingsGroupShape(1, 5),
                     icon = { SettingsIcon(Icons.Outlined.TextFields) },
                     title = "Interface size",
                     subtitle = "Adjust overall UI and supporting text sizing.",
@@ -425,7 +465,7 @@ private fun SettingsReadingPage(
                     onValueChange = onFontScaleChange,
                 )
                 SettingsSliderTile(
-                    shape = settingsGroupShape(1, 4),
+                    shape = settingsGroupShape(2, 5),
                     icon = { SettingsIcon(Icons.Outlined.TextFields) },
                     title = "Arabic text size",
                     subtitle = "Give the Arabic script more presence and breathing room.",
@@ -435,7 +475,7 @@ private fun SettingsReadingPage(
                     onValueChange = onArabicFontScaleChange,
                 )
                 SettingsSliderTile(
-                    shape = settingsGroupShape(2, 4),
+                    shape = settingsGroupShape(3, 5),
                     icon = { SettingsIcon(Icons.Outlined.Translate) },
                     title = "Transliteration size",
                     subtitle = "Control the readability of transliteration lines.",
@@ -445,7 +485,7 @@ private fun SettingsReadingPage(
                     onValueChange = onTransliterationFontScaleChange,
                 )
                 SettingsSliderTile(
-                    shape = settingsGroupShape(3, 4),
+                    shape = settingsGroupShape(4, 5),
                     icon = { SettingsIcon(Icons.Outlined.Translate) },
                     title = "Translation size",
                     subtitle = "Adjust the size of the translated meaning.",
@@ -458,6 +498,72 @@ private fun SettingsReadingPage(
         }
 
         item { Spacer(Modifier.height(24.dp)) }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun SettingsArabicFontBottomSheet(
+    selectedFont: ArabicFontFamily,
+    onFontSelected: (ArabicFontFamily) -> Unit,
+    setShowSheet: (Boolean) -> Unit,
+) {
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val bottomSheetState = rememberModalBottomSheetState()
+    val fontItemColors = ListItemDefaults.colors()
+    val fontItemShapes = ListItemDefaults.shapes()
+
+    fun selectFont(fontFamily: ArabicFontFamily) {
+        scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
+            onFontSelected(fontFamily)
+            setShowSheet(false)
+        }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = { setShowSheet(false) },
+        sheetState = bottomSheetState,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Choose Arabic font",
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .clip(MaterialTheme.shapes.large),
+            ) {
+                itemsIndexed(
+                    ArabicFontFamily.entries,
+                    key = { _, item -> item.name },
+                ) { _, item ->
+                    val selected = item == selectedFont
+
+                    SegmentedListItem(
+                        onClick = { selectFont(item) },
+                        content = { Text(item.label()) },
+                        trailingContent = {
+                            if (selected) {
+                                Icon(
+                                    painter = painterResource(R.drawable.check),
+                                    contentDescription = "Selected",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        },
+                        selected = selected,
+                        shapes = fontItemShapes,
+                        colors = fontItemColors,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+        }
     }
 }
 
@@ -540,7 +646,7 @@ private fun SettingsAboutPage(
 
         item {
             SettingsGroup {
-                SettingsActionTile(
+                SettingsNavigationTile(
                     shape = settingsGroupShape(0, 1),
                     icon = {
                         SettingsPainterIcon(
@@ -761,7 +867,7 @@ private fun SettingsPageScaffold(
                                 FilledTonalIconButton(
                                     onClick = onBack,
                                     colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                        containerColor = settingsTileColor(),
+                                        containerColor = groupedTileContainerColor(),
                                     ),
                                 ) {
                                     Icon(
@@ -809,6 +915,7 @@ private fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp), content = content)
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SettingsNavigationTile(
     shape: RoundedCornerShape,
@@ -817,62 +924,24 @@ private fun SettingsNavigationTile(
     subtitle: String,
     onClick: () -> Unit,
 ) {
-    SettingsInteractiveTile(
-        shape = shape,
+    SettingsSegmentedTile(
         onClick = onClick,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            icon()
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+        shape = shape,
+        icon = icon,
+        title = title,
+        subtitle = subtitle,
+        trailingContent = {
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(18.dp),
             )
-        }
-    }
-}
-
-@Composable
-private fun SettingsActionTile(
-    shape: RoundedCornerShape,
-    icon: @Composable () -> Unit,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-) {
-    SettingsNavigationTile(
-        shape = shape,
-        icon = icon,
-        title = title,
-        subtitle = subtitle,
-        onClick = onClick,
+        },
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SettingsExternalLinkTile(
     shape: RoundedCornerShape,
@@ -881,45 +950,24 @@ private fun SettingsExternalLinkTile(
     subtitle: String,
     onClick: () -> Unit,
 ) {
-    SettingsInteractiveTile(
-        shape = shape,
+    SettingsSegmentedTile(
         onClick = onClick,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            icon()
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+        shape = shape,
+        icon = icon,
+        title = title,
+        subtitle = subtitle,
+        trailingContent = {
             Icon(
                 painter = painterResource(R.drawable.open_in_browser),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(20.dp),
             )
-        }
-    }
+        },
+    )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SettingsSwitchTile(
     shape: RoundedCornerShape,
@@ -929,39 +977,69 @@ private fun SettingsSwitchTile(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
-    SettingsInteractiveTile(
-        shape = shape,
+    SettingsSegmentedTile(
         onClick = { onCheckedChange(!checked) },
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            icon()
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+        shape = shape,
+        icon = icon,
+        title = title,
+        subtitle = subtitle,
+        trailingContent = {
             Switch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
+                thumbContent = {
+                    if (checked) {
+                        Icon(
+                            painter = painterResource(R.drawable.check),
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                        )
+                    }
+                },
             )
-        }
-    }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun SettingsSegmentedTile(
+    onClick: () -> Unit,
+    shape: RoundedCornerShape,
+    icon: @Composable () -> Unit,
+    title: String,
+    subtitle: String,
+    trailingContent: @Composable () -> Unit,
+) {
+    SegmentedListItem(
+        onClick = onClick,
+        leadingContent = { icon() },
+        content = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+            )
+        },
+        supportingContent = {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        trailingContent = trailingContent,
+        colors = settingsListItemColors(),
+        shapes = settingsSegmentedListItemShapes(shape),
+    )
 }
 
 @Composable
@@ -1134,7 +1212,7 @@ private fun ThemeSeedSwatch(
     onClick: () -> Unit,
 ) {
     val swatchColor = if (colorValue == DefaultThemeSeedColor) {
-        settingsTileColor()
+        groupedTileContainerColor()
     } else {
         Color(colorValue)
     }
@@ -1390,16 +1468,17 @@ private fun <T> ConnectedChoiceRow(
         ) {
             options.forEachIndexed { index, option ->
                 val isSelected = option == selected
+                val optionShape = connectedChoiceShape(index, options.size)
                 Surface(
                     color = if (isSelected) {
                         MaterialTheme.colorScheme.primaryContainer
                     } else {
                         Color.Transparent
                     },
-                    shape = connectedChoiceShape(index, options.size),
+                    shape = optionShape,
                     modifier = Modifier
                         .weight(1f)
-                        .clip(connectedChoiceShape(index, options.size))
+                        .clip(optionShape)
                         .clickable { onSelected(option) },
                 ) {
                     Box(
@@ -1427,22 +1506,22 @@ private fun <T> ConnectedChoiceRow(
 }
 
 @Composable
-private fun SettingsInteractiveTile(
+private fun settingsListItemColors() = ListItemDefaults.colors(
+    containerColor = groupedTileContainerColor(),
+)
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun settingsSegmentedListItemShapes(
     shape: RoundedCornerShape,
-    onClick: () -> Unit,
-    content: @Composable () -> Unit,
-) {
-    Surface(
-        color = settingsTileColor(),
-        shape = shape,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .clickable(onClick = onClick),
-    ) {
-        content()
-    }
-}
+) = ListItemDefaults.shapes(
+    shape = shape,
+    selectedShape = shape,
+    pressedShape = shape,
+    focusedShape = shape,
+    hoveredShape = shape,
+    draggedShape = shape,
+)
 
 @Composable
 private fun SettingsStaticTile(
@@ -1450,7 +1529,7 @@ private fun SettingsStaticTile(
     content: @Composable () -> Unit,
 ) {
     Surface(
-        color = settingsTileColor(),
+        color = groupedTileContainerColor(),
         shape = shape,
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -1466,11 +1545,6 @@ private fun SettingsIcon(imageVector: androidx.compose.ui.graphics.vector.ImageV
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.size(24.dp),
     )
-}
-
-@Composable
-private fun settingsTileColor(): Color {
-    return groupedTileContainerColor()
 }
 
 private fun settingsGroupShape(index: Int, count: Int): RoundedCornerShape {
@@ -1526,5 +1600,13 @@ private fun multiplierLabel(value: Float): String {
 private fun ThemeMode.label(): String {
     return name.lowercase().replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+    }
+}
+
+private fun ArabicFontFamily.label(): String {
+    return when (this) {
+        ArabicFontFamily.AMIRI -> "Amiri"
+        ArabicFontFamily.NOTO_NASKH -> "Noto Naskh"
+        ArabicFontFamily.SCHEHERAZADE -> "Scheherazade"
     }
 }

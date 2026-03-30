@@ -15,6 +15,18 @@ interface ProgressDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(entity: ProgressEntity)
 
+    @Query(
+        """
+        DELETE FROM progress
+        WHERE dhikrId IN (
+            SELECT id
+            FROM adhkar
+            WHERE collectionId = :collectionId
+        )
+        """,
+    )
+    suspend fun deleteByCollectionId(collectionId: Long)
+
     @Query("DELETE FROM progress")
     suspend fun deleteAll()
 }

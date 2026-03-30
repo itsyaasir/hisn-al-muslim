@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.hisnulmuslim.core.model.AppSettings
+import com.example.hisnulmuslim.core.model.ArabicFontFamily
 import com.example.hisnulmuslim.core.model.DefaultThemeSeedColor
 import com.example.hisnulmuslim.core.model.ThemeMode
 import javax.inject.Inject
@@ -26,6 +27,8 @@ class DefaultSettingsRepository @Inject constructor(
                 pureBlackThemeEnabled = preferences[PURE_BLACK_THEME] ?: false,
                 themeSeedColor = preferences[THEME_SEED_COLOR] ?: DefaultThemeSeedColor,
                 fontScale = preferences[FONT_SCALE] ?: 1.0f,
+                arabicFontFamily = preferences[ARABIC_FONT_FAMILY]?.let(ArabicFontFamily::valueOf)
+                    ?: ArabicFontFamily.AMIRI,
                 arabicFontScale = preferences[ARABIC_FONT_SCALE] ?: 1.15f,
                 transliterationFontScale = preferences[TRANSLITERATION_FONT_SCALE] ?: 1.0f,
                 translationFontScale = preferences[TRANSLATION_FONT_SCALE] ?: 1.0f,
@@ -55,6 +58,10 @@ class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setFontScale(scale: Float) {
         dataStore.edit { it[FONT_SCALE] = scale }
+    }
+
+    override suspend fun setArabicFontFamily(fontFamily: ArabicFontFamily) {
+        dataStore.edit { it[ARABIC_FONT_FAMILY] = fontFamily.name }
     }
 
     override suspend fun setArabicFontScale(scale: Float) {
@@ -91,6 +98,7 @@ class DefaultSettingsRepository @Inject constructor(
         val PURE_BLACK_THEME = booleanPreferencesKey("pure_black_theme")
         val THEME_SEED_COLOR = longPreferencesKey("theme_seed_color")
         val FONT_SCALE = floatPreferencesKey("font_scale")
+        val ARABIC_FONT_FAMILY = stringPreferencesKey("arabic_font_family")
         val ARABIC_FONT_SCALE = floatPreferencesKey("arabic_font_scale")
         val TRANSLITERATION_FONT_SCALE = floatPreferencesKey("transliteration_font_scale")
         val TRANSLATION_FONT_SCALE = floatPreferencesKey("translation_font_scale")

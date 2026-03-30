@@ -16,5 +16,6 @@ interface DhikrRepository {
     fun observeProgress(dhikrId: Long): Flow<DhikrProgress?>
     suspend fun toggleFavorite(dhikrId: Long)
     suspend fun updateProgress(dhikrId: Long, currentCount: Int, completedCount: Int)
-    suspend fun resetProgress()
+    suspend fun clearCollectionProgress(collectionId: Long)
+    suspend fun clearFavorites()
 }
