@@ -374,7 +374,10 @@ fun DhikrDetailScreen(
                                     pageDhikr.sourceReference?.let {
                                         Text(
                                             text = it,
-                                            style = MaterialTheme.typography.bodyLarge,
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontStyle = FontStyle.Italic,
+                                            ),
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.86f),
                                         )
                                     }
                                     pageDhikr.notes?.let {
@@ -451,7 +454,7 @@ private fun DetailScrollableHeader(
         IconButton(onClick = onToggleFavorite) {
             Icon(
                 imageVector = if (isFavorite) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder,
-                contentDescription = if (isFavorite) "Saved" else "Save",
+                contentDescription = if (isFavorite) "Saved collection" else "Save collection",
             )
         }
         Box {

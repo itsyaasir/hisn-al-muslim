@@ -36,8 +36,8 @@ class DhikrRepository @Inject constructor(
         return dhikrDao.observeAllOrdered().map { items -> items.map { it.toModel() } }
     }
 
-    fun observeFavorites(): Flow<List<Dhikr>> {
-        return dhikrDao.observeFavorites().map { items -> items.map { it.toModel() } }
+    fun observeFavoriteCollections(): Flow<List<Collection>> {
+        return dhikrDao.observeFavoriteCollections().map { items -> items.map { it.toModel() } }
     }
 
     fun observeDailyHighlight(): Flow<Dhikr?> {
@@ -60,25 +60,40 @@ class DhikrRepository @Inject constructor(
         return dhikrDao.search(normalizedQuery).map { items -> items.map { it.toModel() } }
     }
 
-    fun observeIsFavorite(dhikrId: Long): Flow<Boolean> {
-        return favoriteDao.observeIsFavorite(dhikrId)
+    fun observeIsCollectionFavorite(collectionId: Long): Flow<Boolean> {
+        return favoriteDao.observeIsCollectionFavorite(collectionId)
     }
 
     fun observeProgress(dhikrId: Long): Flow<DhikrProgress?> {
         return progressDao.observeByDhikrId(dhikrId).map { it?.toModel() }
     }
 
-    suspend fun toggleFavorite(dhikrId: Long) {
-        if (favoriteDao.isFavorite(dhikrId)) {
-            favoriteDao.deleteByDhikrId(dhikrId)
+    suspend fun toggleCollectionFavorite(collectionId: Long) {
+        val isFavorite = favoriteDao.isCollectionFavorite(collectionId)
+        if (isFavorite) {
+            removeCollectionFavorite(collectionId)
         } else {
-            favoriteDao.upsert(
+            addCollectionFavorite(collectionId)
+        }
+    }
+
+    suspend fun addCollectionFavorite(collectionId: Long) {
+        val dhikrIds = dhikrDao.getDhikrIdsForCollection(collectionId)
+        if (dhikrIds.isEmpty()) return
+
+        val createdAt = timeProvider.now()
+        favoriteDao.upsertAll(
+            dhikrIds.map { dhikrId ->
                 FavoriteEntity(
                     dhikrId = dhikrId,
-                    createdAt = timeProvider.now(),
-                ),
-            )
-        }
+                    createdAt = createdAt,
+                )
+            },
+        )
+    }
+
+    suspend fun removeCollectionFavorite(collectionId: Long) {
+        favoriteDao.deleteByCollectionId(collectionId)
     }
 
     suspend fun updateProgress(dhikrId: Long, currentCount: Int, completedCount: Int) {

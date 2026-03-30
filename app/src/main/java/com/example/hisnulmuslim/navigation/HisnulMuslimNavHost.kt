@@ -115,11 +115,11 @@ fun HisnulMuslimNavHost(
                     entry<AppDestination.Favorites> { _ ->
                         FavoritesScreen(
                             contentPadding = innerPadding,
-                            onOpenDhikr = { dhikr ->
+                            onOpenCollection = { collection ->
                                 backStack.add(
                                     AppDestination.DhikrDetail(
-                                        dhikrId = dhikr.id,
-                                        collectionId = dhikr.collectionId,
+                                        dhikrId = collection.firstDhikrId,
+                                        collectionId = collection.id,
                                     ),
                                 )
                             },

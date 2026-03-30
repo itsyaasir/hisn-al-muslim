@@ -60,34 +60,37 @@ interface DhikrDao {
             adhkar.orderIndex,
             adhkar.tags
         FROM adhkar
-        INNER JOIN favorites ON favorites.dhikrId = adhkar.id
-        ORDER BY favorites.createdAt DESC
-        """,
-    )
-    fun observeFavorites(): Flow<List<DhikrRow>>
-
-    @Query(
-        """
-        SELECT
-            adhkar.id,
-            adhkar.collectionId,
-            adhkar.collectionTitle,
-            adhkar.collectionSubtitle,
-            adhkar.collectionOrderIndex,
-            adhkar.title,
-            adhkar.arabicText,
-            adhkar.transliteration,
-            adhkar.translation,
-            adhkar.repeatCount,
-            adhkar.notes,
-            adhkar.sourceReference,
-            adhkar.orderIndex,
-            adhkar.tags
-        FROM adhkar
         ORDER BY adhkar.collectionOrderIndex, adhkar.orderIndex, adhkar.title
         """,
     )
     fun observeAllOrdered(): Flow<List<DhikrRow>>
+
+    @Query(
+        """
+        SELECT
+            grouped.collectionId AS id,
+            grouped.collectionTitle AS title,
+            grouped.collectionSubtitle AS subtitle,
+            grouped.collectionOrderIndex AS orderIndex,
+            (
+                SELECT innerAdhkar.id
+                FROM adhkar AS innerAdhkar
+                WHERE innerAdhkar.collectionId = grouped.collectionId
+                ORDER BY innerAdhkar.orderIndex, innerAdhkar.id
+                LIMIT 1
+            ) AS firstDhikrId,
+            COUNT(*) AS itemCount
+        FROM adhkar AS grouped
+        INNER JOIN favorites ON favorites.dhikrId = grouped.id
+        GROUP BY
+            grouped.collectionId,
+            grouped.collectionTitle,
+            grouped.collectionSubtitle,
+            grouped.collectionOrderIndex
+        ORDER BY MAX(favorites.createdAt) DESC, grouped.collectionOrderIndex, grouped.collectionTitle
+        """,
+    )
+    fun observeFavoriteCollections(): Flow<List<CollectionRow>>
 
     @Query(
         """
@@ -141,6 +144,9 @@ interface DhikrDao {
 
     @Query("SELECT COUNT(*) FROM adhkar")
     suspend fun count(): Int
+
+    @Query("SELECT id FROM adhkar WHERE collectionId = :collectionId ORDER BY orderIndex, id")
+    suspend fun getDhikrIdsForCollection(collectionId: Long): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(adhkar: List<DhikrEntity>)
