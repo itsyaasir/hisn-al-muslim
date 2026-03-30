@@ -54,6 +54,7 @@ import com.example.hisnulmuslim.core.designsystem.EmptyStateCard
 import com.example.hisnulmuslim.core.designsystem.HisnulMuslimTheme
 import com.example.hisnulmuslim.core.designsystem.LocalAppFonts
 import com.example.hisnulmuslim.core.designsystem.appTopBarContainerColor
+import com.example.hisnulmuslim.core.designsystem.appTopBarColors
 import com.example.hisnulmuslim.core.designsystem.groupedTileContainerColor
 import com.example.hisnulmuslim.core.designsystem.mergePaddingValues
 import com.example.hisnulmuslim.core.model.Collection
@@ -144,10 +145,7 @@ private fun HomeScreenContent(
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = topBarContainer,
-                        scrolledContainerColor = topBarContainer,
-                    ),
+                    colors = appTopBarColors(),
                     titleHorizontalAlignment = Alignment.Start,
                     scrollBehavior = scrollBehavior,
                     windowInsets = WindowInsets(),

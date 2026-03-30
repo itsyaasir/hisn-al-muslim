@@ -4,6 +4,8 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -67,12 +69,28 @@ private val CalmDarkColors = darkColorScheme(
 val LocalBlackTheme = staticCompositionLocalOf { false }
 
 @Composable
+fun appTopBarColors(): TopAppBarColors {
+    return TopAppBarDefaults.topAppBarColors(
+        containerColor = appTopBarContainerColor(),
+        scrolledContainerColor = appTopBarContainerColor(),
+    )
+}
+
+@Composable
 fun appTopBarContainerColor(): Color {
     return if (LocalBlackTheme.current) {
         MaterialTheme.colorScheme.surface
     } else {
         MaterialTheme.colorScheme.surfaceContainer
     }
+}
+
+@Composable
+fun detailTopBarColors(): TopAppBarColors {
+    return TopAppBarDefaults.topAppBarColors(
+        containerColor = detailTopBarContainerColor(),
+        scrolledContainerColor = detailTopBarContainerColor(),
+    )
 }
 
 @Composable

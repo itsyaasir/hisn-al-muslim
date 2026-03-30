@@ -2,6 +2,7 @@ package com.example.hisnulmuslim.navigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -78,10 +79,26 @@ fun TopLevelFloatingNavigationBar(
             fadeOut(animationSpec = motionPreferences.expressiveFastEffect()),
         modifier = modifier.fillMaxWidth(),
     ) {
-        val toolbarContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.88f)
-        val toolbarContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        val selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer
-        val selectedContentColor = MaterialTheme.colorScheme.secondary
+        val toolbarContainerColor by animateColorAsState(
+            targetValue = MaterialTheme.colorScheme.primaryContainer,
+            animationSpec = motionPreferences.expressiveFastEffect(),
+            label = "top_level_toolbar_container",
+        )
+        val toolbarContentColor by animateColorAsState(
+            targetValue = MaterialTheme.colorScheme.onPrimaryContainer,
+            animationSpec = motionPreferences.expressiveFastEffect(),
+            label = "top_level_toolbar_content",
+        )
+        val selectedContainerColor by animateColorAsState(
+            targetValue = MaterialTheme.colorScheme.primary,
+            animationSpec = motionPreferences.expressiveFastEffect(),
+            label = "top_level_selected_container",
+        )
+        val selectedContentColor by animateColorAsState(
+            targetValue = MaterialTheme.colorScheme.onPrimary,
+            animationSpec = motionPreferences.expressiveFastEffect(),
+            label = "top_level_selected_content",
+        )
 
         Box(
             modifier = Modifier

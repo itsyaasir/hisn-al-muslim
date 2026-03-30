@@ -40,6 +40,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.hisnulmuslim.core.designsystem.EmptyStateCard
 import com.example.hisnulmuslim.core.designsystem.LocalAppFonts
+import com.example.hisnulmuslim.core.designsystem.appTopBarColors
 import com.example.hisnulmuslim.core.designsystem.appTopBarContainerColor
 import com.example.hisnulmuslim.core.designsystem.groupedTileContainerColor
 import com.example.hisnulmuslim.core.designsystem.mergePaddingValues
@@ -92,10 +93,7 @@ fun SearchScreen(
                     titleHorizontalAlignment = Alignment.CenterHorizontally,
                     scrollBehavior = scrollBehavior,
                     windowInsets = WindowInsets(),
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = topBarContainer,
-                        scrolledContainerColor = topBarContainer,
-                    ),
+                    colors = appTopBarColors(),
                 )
             },
         ) { innerPadding ->
