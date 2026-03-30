@@ -49,7 +49,7 @@ data class DhikrDetailUiState(
 @HiltViewModel
 class DhikrDetailViewModel @Inject constructor(
     private val repository: DhikrRepository,
-    private val settingsRepository: SettingsRepository,
+    settingsRepository: SettingsRepository,
 ) : ViewModel() {
     private val dhikrId = MutableStateFlow<Long?>(null)
     private val collectionId = MutableStateFlow<Long?>(null)

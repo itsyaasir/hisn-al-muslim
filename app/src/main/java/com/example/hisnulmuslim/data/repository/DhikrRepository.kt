@@ -32,10 +32,6 @@ class DhikrRepository @Inject constructor(
         return dhikrDao.observeCollectionDhikr(collectionId).map { items -> items.map { it.toModel() } }
     }
 
-    fun observeAllDhikrOrdered(): Flow<List<Dhikr>> {
-        return dhikrDao.observeAllOrdered().map { items -> items.map { it.toModel() } }
-    }
-
     fun observeFavorites(): Flow<List<Dhikr>> {
         return dhikrDao.observeFavorites().map { items -> items.map { it.toModel() } }
     }

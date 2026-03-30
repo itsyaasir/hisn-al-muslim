@@ -16,7 +16,6 @@ import com.example.hisnulmuslim.data.repository.DefaultSeedRepository
 import com.example.hisnulmuslim.data.repository.DefaultSettingsRepository
 import com.example.hisnulmuslim.data.repository.SeedRepository
 import com.example.hisnulmuslim.data.repository.SettingsRepository
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -70,24 +69,16 @@ object AppProvidesModule {
     @Provides
     @Singleton
     fun provideTimeProvider(): TimeProvider = TimeProvider(System::currentTimeMillis)
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppBindsModule {
+    @Provides
+    @Singleton
+    fun provideSeedRepository(repository: DefaultSeedRepository): SeedRepository = repository
 
-    @Binds
-    abstract fun bindSeedRepository(
-        repository: DefaultSeedRepository,
-    ): SeedRepository
+    @Provides
+    @Singleton
+    fun provideSeedDataSource(dataSource: AssetSeedDataSource): SeedDataSource = dataSource
 
-    @Binds
-    abstract fun bindSeedDataSource(
-        dataSource: AssetSeedDataSource,
-    ): SeedDataSource
-
-    @Binds
-    abstract fun bindSettingsRepository(
-        repository: DefaultSettingsRepository,
-    ): SettingsRepository
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(repository: DefaultSettingsRepository): SettingsRepository = repository
 }
