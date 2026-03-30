@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,33 +35,33 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
@@ -71,6 +70,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -107,10 +107,10 @@ fun DhikrDetailScreen(
     val haptic = LocalHapticFeedback.current
     val topBarTitleFont = LocalAppFonts.current.topBarTitle
     val layoutDirection = LocalLayoutDirection.current
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val expressiveShapes = LocalExpressiveShapes.current
     val motionPreferences = LocalMotionPreferences.current
     val pagerState = rememberPagerState(pageCount = { uiState.collectionDhikr.size })
+    val headerTitle = uiState.dhikr?.collectionTitle.orEmpty()
 
     LaunchedEffect(uiState.currentIndex, uiState.collectionDhikr.size) {
         if (uiState.collectionDhikr.isEmpty()) return@LaunchedEffect
@@ -128,56 +128,91 @@ fun DhikrDetailScreen(
             }
     }
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
-                title = {
-                    Text(
-                        text = uiState.dhikr?.title.orEmpty(),
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontFamily = topBarTitleFont,
-                        ),
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back",
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets(),
-            )
-        },
-    ) { innerPadding ->
-        val screenInsets = mergePaddingValues(innerPadding, contentPadding, layoutDirection)
-        val pageInsets = mergePaddingValues(
-            screenInsets,
-            PaddingValues(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 124.dp),
-            layoutDirection,
+    val screenInsets = contentPadding
+    val pageInsets = mergePaddingValues(
+        PaddingValues(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 124.dp),
+        PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+        layoutDirection,
+    )
+
+    if (uiState.collectionDhikr.isEmpty()) {
+        EmptyStateCard(
+            title = "Dhikr not found",
+            subtitle = "The selected item may no longer be available in the current collection.",
+            modifier = Modifier
+                .padding(screenInsets)
+                .padding(20.dp),
         )
+        return
+    }
 
-        if (uiState.collectionDhikr.isEmpty()) {
-            EmptyStateCard(
-                title = "Dhikr not found",
-                subtitle = "The selected item may no longer be available in the current collection.",
-                modifier = Modifier
-                    .padding(screenInsets)
-                    .padding(20.dp),
-            )
-            return@Scaffold
-        }
-
-        Box(
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Column(
             modifier = Modifier.fillMaxSize(),
         ) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopCenter,
+            ) {
+                DetailScrollableHeader(
+                    title = headerTitle,
+                    fontFamily = topBarTitleFont,
+                    onBack = onBack,
+                    isFavorite = uiState.isFavorite,
+                    onToggleFavorite = { viewModel.toggleFavorite() },
+                    onCopy = {
+                        val currentDhikr = uiState.dhikr ?: return@DetailScrollableHeader
+                        coroutineScope.launch {
+                            clipboard.setClipEntry(
+                                ClipEntry(
+                                    ClipData.newPlainText(
+                                        "Dhikr",
+                                        formatShareText(currentDhikr),
+                                    ),
+                                ),
+                            )
+                        }
+                    },
+                    onShare = {
+                        val currentDhikr = uiState.dhikr ?: return@DetailScrollableHeader
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, formatShareText(currentDhikr))
+                        }
+                        context.startActivity(Intent.createChooser(shareIntent, "Share dhikr"))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .widthIn(max = 900.dp)
+                        .padding(
+                            start = 20.dp,
+                            top = contentPadding.calculateTopPadding() + 16.dp,
+                            end = 20.dp,
+                        ),
+                )
+            }
+
+            if (uiState.showsCollectionDots) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CollectionDotsIndicator(
+                        count = uiState.collectionDhikr.size,
+                        selectedIndex = uiState.currentIndex,
+                    )
+                }
+            }
+
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 userScrollEnabled = uiState.collectionDhikr.size > 1,
                 beyondViewportPageCount = 0,
             ) { page ->
@@ -196,13 +231,6 @@ fun DhikrDetailScreen(
                             .padding(pageInsets),
                         verticalArrangement = Arrangement.spacedBy(20.dp),
                     ) {
-                        if (uiState.showsCollectionDots) {
-                            CollectionDotsIndicator(
-                                count = uiState.collectionDhikr.size,
-                                selectedIndex = uiState.currentIndex,
-                            )
-                        }
-
                         ElevatedCard(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -260,81 +288,6 @@ fun DhikrDetailScreen(
                             }
                         }
 
-                        ElevatedCard(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = expressiveShapes.actionCard,
-                            colors = CardDefaults.elevatedCardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                            ),
-                        ) {
-                            FlowRow(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                FilledTonalButton(
-                                    onClick = {
-                                        if (isActivePage) {
-                                            viewModel.toggleFavorite()
-                                        } else {
-                                            viewModel.selectDhikr(pageDhikr.id)
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) {
-                                    Icon(
-                                        imageVector = if (isActivePage && uiState.isFavorite) {
-                                            Icons.Outlined.Bookmark
-                                        } else {
-                                            Icons.Outlined.BookmarkBorder
-                                        },
-                                        contentDescription = null,
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(if (isActivePage && uiState.isFavorite) "Saved" else "Save")
-                                }
-                                OutlinedButton(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            clipboard.setClipEntry(
-                                                ClipEntry(
-                                                    ClipData.newPlainText(
-                                                        "Dhikr",
-                                                        formatShareText(pageDhikr),
-                                                    ),
-                                                ),
-                                            )
-                                        }
-                                    },
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.ContentCopy,
-                                        contentDescription = null,
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Copy")
-                                }
-                                OutlinedButton(
-                                    onClick = {
-                                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                            type = "text/plain"
-                                            putExtra(Intent.EXTRA_TEXT, formatShareText(pageDhikr))
-                                        }
-                                        context.startActivity(Intent.createChooser(shareIntent, "Share dhikr"))
-                                    },
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Share,
-                                        contentDescription = null,
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Share")
-                                }
-                            }
-                        }
-
                         if (uiState.settings.showReference && (!pageDhikr.notes.isNullOrBlank() || !pageDhikr.sourceReference.isNullOrBlank())) {
                             ElevatedCard(
                                 modifier = Modifier.fillMaxWidth(),
@@ -367,26 +320,107 @@ fun DhikrDetailScreen(
                     }
                 }
             }
+        }
 
-            DetailFloatingActions(
-                showsCounterHero = uiState.showsCounterHero,
-                uiState = uiState,
-                screenInsets = screenInsets,
-                onCount = {
-                    if (uiState.isCounterRoundComplete) {
-                        haptic.performHapticFeedback(HapticFeedbackType.ToggleOff)
-                        viewModel.resetCounter()
+        DetailFloatingActions(
+            showsCounterHero = uiState.showsCounterHero,
+            uiState = uiState,
+            screenInsets = screenInsets,
+            onCount = {
+                if (uiState.isCounterRoundComplete) {
+                    haptic.performHapticFeedback(HapticFeedbackType.ToggleOff)
+                    viewModel.resetCounter()
+                } else {
+                    val hapticType = if (uiState.remainingCount == 1) {
+                        HapticFeedbackType.ToggleOn
                     } else {
-                        val hapticType = if (uiState.remainingCount == 1) {
-                            HapticFeedbackType.ToggleOn
-                        } else {
-                            HapticFeedbackType.VirtualKey
-                        }
-                        haptic.performHapticFeedback(hapticType)
-                        viewModel.incrementCounter()
+                        HapticFeedbackType.VirtualKey
                     }
-                },
+                    haptic.performHapticFeedback(hapticType)
+                    viewModel.incrementCounter()
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun DetailScrollableHeader(
+    title: String,
+    fontFamily: FontFamily,
+    onBack: () -> Unit,
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
+    onCopy: () -> Unit,
+    onShare: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var actionsExpanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = onBack) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                contentDescription = "Back",
             )
+        }
+        Text(
+            text = title,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontFamily = fontFamily,
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        IconButton(onClick = onToggleFavorite) {
+            Icon(
+                imageVector = if (isFavorite) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder,
+                contentDescription = if (isFavorite) "Saved" else "Save",
+            )
+        }
+        Box {
+            IconButton(onClick = { actionsExpanded = true }) {
+                Icon(
+                    imageVector = Icons.Outlined.MoreVert,
+                    contentDescription = "More actions",
+                )
+            }
+            DropdownMenu(
+                expanded = actionsExpanded,
+                onDismissRequest = { actionsExpanded = false },
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Copy") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.ContentCopy,
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        actionsExpanded = false
+                        onCopy()
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text("Share") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Share,
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        actionsExpanded = false
+                        onShare()
+                    },
+                )
+            }
         }
     }
 }
