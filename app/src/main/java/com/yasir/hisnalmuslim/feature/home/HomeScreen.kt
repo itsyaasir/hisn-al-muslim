@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoStories
+import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -82,6 +83,7 @@ fun HomeScreen(
         onOpenSearch = onOpenSearch,
         onOpenCollection = onOpenCollection,
         onOpenDhikr = onOpenDhikr,
+        onShowAnotherReflection = viewModel::showAnotherReflection,
     )
 }
 
@@ -93,6 +95,7 @@ private fun HomeScreenContent(
     onOpenSearch: () -> Unit,
     onOpenCollection: (Collection) -> Unit,
     onOpenDhikr: (Dhikr) -> Unit,
+    onShowAnotherReflection: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val listState = rememberLazyListState()
@@ -174,8 +177,10 @@ private fun HomeScreenContent(
                         item {
                             DailyReflectionTile(
                                 dhikr = dhikr,
+                                canShowAnother = uiState.canAdvanceDailyHighlight,
                                 collapseProgress = collapseProgress,
                                 onClick = { onOpenDhikr(dhikr) },
+                                onShowAnotherReflection = onShowAnotherReflection,
                             )
                         }
                         item { Spacer(Modifier.height(12.dp)) }
@@ -205,8 +210,10 @@ private fun HomeScreenContent(
 @Composable
 private fun DailyReflectionTile(
     dhikr: Dhikr,
+    canShowAnother: Boolean,
     collapseProgress: Float,
     onClick: () -> Unit,
+    onShowAnotherReflection: () -> Unit,
 ) {
     val compactPadding = 14.dp
     val expandedPadding = 20.dp
@@ -228,11 +235,30 @@ private fun DailyReflectionTile(
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(
-                text = "Daily reflection",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Daily reflection",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
+                )
+                if (canShowAnother) {
+                    FilledTonalIconButton(
+                        onClick = onShowAnotherReflection,
+                        modifier = Modifier.size(40.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Autorenew,
+                            contentDescription = "Show another reflection",
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                }
+            }
             Text(
                 text = dhikr.title,
                 style = MaterialTheme.typography.headlineSmall.copy(
@@ -399,6 +425,7 @@ private fun HomeScreenPreview() {
             onOpenSearch = {},
             onOpenCollection = {},
             onOpenDhikr = {},
+            onShowAnotherReflection = {},
         )
     }
 }

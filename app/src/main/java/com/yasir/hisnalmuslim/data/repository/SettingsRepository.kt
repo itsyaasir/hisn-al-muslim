@@ -85,6 +85,19 @@ class SettingsRepository @Inject constructor(
     suspend fun setShowReference(visible: Boolean) {
         dataStore.edit { it[SHOW_REFERENCE] = visible }
     }
+
+    fun observeDailyReflectionOffset(): Flow<Long> {
+        return dataStore.data.map { preferences ->
+            preferences[DAILY_REFLECTION_OFFSET] ?: 0L
+        }
+    }
+
+    suspend fun advanceDailyReflection() {
+        dataStore.edit { preferences ->
+            preferences[DAILY_REFLECTION_OFFSET] = (preferences[DAILY_REFLECTION_OFFSET] ?: 0L) + 1L
+        }
+    }
+
     private companion object {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
@@ -98,5 +111,6 @@ class SettingsRepository @Inject constructor(
         val SHOW_TRANSLITERATION = booleanPreferencesKey("show_transliteration")
         val SHOW_TRANSLATION = booleanPreferencesKey("show_translation")
         val SHOW_REFERENCE = booleanPreferencesKey("show_reference")
+        val DAILY_REFLECTION_OFFSET = longPreferencesKey("daily_reflection_offset")
     }
 }
