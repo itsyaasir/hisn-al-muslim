@@ -34,7 +34,6 @@ class SettingsRepository @Inject constructor(
                 showTransliteration = preferences[SHOW_TRANSLITERATION] ?: true,
                 showTranslation = preferences[SHOW_TRANSLATION] ?: true,
                 showReference = preferences[SHOW_REFERENCE] ?: true,
-                onboardingCompleted = preferences[ONBOARDING_COMPLETED] ?: false,
             )
         }
     }
@@ -86,11 +85,6 @@ class SettingsRepository @Inject constructor(
     suspend fun setShowReference(visible: Boolean) {
         dataStore.edit { it[SHOW_REFERENCE] = visible }
     }
-
-    suspend fun setOnboardingCompleted(completed: Boolean) {
-        dataStore.edit { it[ONBOARDING_COMPLETED] = completed }
-    }
-
     private companion object {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
@@ -104,6 +98,5 @@ class SettingsRepository @Inject constructor(
         val SHOW_TRANSLITERATION = booleanPreferencesKey("show_transliteration")
         val SHOW_TRANSLATION = booleanPreferencesKey("show_translation")
         val SHOW_REFERENCE = booleanPreferencesKey("show_reference")
-        val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     }
 }
