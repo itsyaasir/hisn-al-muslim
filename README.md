@@ -1,10 +1,10 @@
 <div align="center">
 
-# Hisnul Muslim
+# Hisn Al-Muslim
 
 ## About
 
-Hisnul Muslim is an offline-first Android app for reading and revisiting adhkar from *Hisnul Muslim*.
+Hisn Al-Muslim is an offline-first Android app for reading and revisiting adhkar from *Hisnul Muslim*.
 
 Built with Jetpack Compose and Material 3, it focuses on calm reading, Arabic typography, collection-based navigation, and customizable reading settings.
 
