@@ -2,6 +2,7 @@ package com.example.hisnulmuslim.feature.adhkardetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.Immutable
 import com.example.hisnulmuslim.core.model.AppSettings
 import com.example.hisnulmuslim.core.model.Dhikr
 import com.example.hisnulmuslim.core.model.DhikrProgress
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@Immutable
 data class DhikrDetailUiState(
     val collectionDhikr: List<Dhikr> = emptyList(),
     val currentIndex: Int = 0,

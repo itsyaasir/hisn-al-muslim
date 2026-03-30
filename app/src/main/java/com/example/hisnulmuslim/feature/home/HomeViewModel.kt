@@ -2,6 +2,7 @@ package com.example.hisnulmuslim.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.Immutable
 import com.example.hisnulmuslim.core.model.Collection
 import com.example.hisnulmuslim.core.model.Dhikr
 import com.example.hisnulmuslim.data.repository.DhikrRepository
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
+@Immutable
 data class HomeUiState(
     val collections: List<Collection> = emptyList(),
     val dailyHighlight: Dhikr? = null,

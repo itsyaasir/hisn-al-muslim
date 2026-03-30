@@ -1,5 +1,8 @@
 package com.example.hisnulmuslim.core.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class Dhikr(
     val id: Long,
     val collectionId: Long,

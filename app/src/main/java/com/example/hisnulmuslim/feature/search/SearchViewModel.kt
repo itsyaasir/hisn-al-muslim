@@ -2,6 +2,7 @@ package com.example.hisnulmuslim.feature.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.Immutable
 import com.example.hisnulmuslim.core.model.Dhikr
 import com.example.hisnulmuslim.data.repository.DhikrRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 
+@Immutable
 data class SearchUiState(
     val query: String = "",
     val results: List<Dhikr> = emptyList(),

@@ -46,9 +46,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
 import androidx.window.core.layout.WindowSizeClass
-import androidx.compose.ui.zIndex
 import androidx.compose.material3.rememberTooltipState
+import androidx.compose.ui.zIndex
 import com.example.hisnulmuslim.core.designsystem.LocalMotionPreferences
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -106,7 +107,7 @@ fun TopLevelFloatingNavigationBar(
                     )
                     .zIndex(1f),
             ) {
-                TopLevelDestination.entries.forEach { destination ->
+                TopLevelDestination.entries.fastForEach { destination ->
                     val selected by remember(currentDestination) {
                         derivedStateOf { currentDestination == destination.destination }
                     }

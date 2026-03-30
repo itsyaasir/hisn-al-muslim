@@ -1,5 +1,8 @@
 package com.example.hisnulmuslim.core.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val dynamicColorEnabled: Boolean = true,
