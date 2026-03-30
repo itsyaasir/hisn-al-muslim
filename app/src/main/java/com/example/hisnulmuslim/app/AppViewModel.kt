@@ -2,6 +2,7 @@ package com.example.hisnulmuslim.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hisnulmuslim.data.repository.DhikrRepository
 import com.example.hisnulmuslim.data.repository.SeedRepository
 import com.example.hisnulmuslim.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,11 +11,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
+    private val dhikrRepository: DhikrRepository,
     seedRepository: SeedRepository,
     settingsRepository: SettingsRepository,
 ) : ViewModel() {
@@ -24,6 +27,8 @@ class AppViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             seedRepository.ensureSeeded()
+            dhikrRepository.observeCollections().first()
+            dhikrRepository.observeDailyHighlight().first()
             isReady.value = true
         }
     }

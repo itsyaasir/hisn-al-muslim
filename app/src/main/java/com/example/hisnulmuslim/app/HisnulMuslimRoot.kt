@@ -18,11 +18,7 @@ fun HisnulMuslimRoot(
         settings = uiState.settings,
     ) {
         Surface {
-            if (uiState.isReady) {
-                HisnulMuslimNavHost()
-            } else {
-                AppLoadingScreen()
-            }
+            HisnulMuslimNavHost()
         }
     }
 }

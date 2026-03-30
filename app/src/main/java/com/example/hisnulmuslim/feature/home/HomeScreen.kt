@@ -183,7 +183,9 @@ private fun HomeScreenContent(
                         item { Spacer(Modifier.height(12.dp)) }
                     }
 
-                    if (uiState.collections.isEmpty()) {
+                    if (!uiState.isLoaded) {
+                        item { Spacer(Modifier.height(1.dp)) }
+                    } else if (uiState.collections.isEmpty()) {
                         item {
                             EmptyStateCard(
                                 title = "No collections yet",
