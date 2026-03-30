@@ -181,13 +181,11 @@ private fun HomeScreenContent(
                         item { Spacer(Modifier.height(12.dp)) }
                     }
 
-                    if (!uiState.isLoaded) {
-                        item { Spacer(Modifier.height(1.dp)) }
-                    } else if (uiState.collections.isEmpty()) {
+                    if (uiState.collections.isEmpty()) {
                         item {
                             EmptyStateCard(
                                 title = "No collections yet",
-                                subtitle = "The local remembrance collection is still loading or needs to be seeded again.",
+                                subtitle = "No remembrance collections are available right now.",
                             )
                         }
                     } else {

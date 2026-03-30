@@ -65,7 +65,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -119,8 +121,8 @@ fun SettingsScreen(
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val settings by viewModel.uiState.collectAsStateWithLifecycle()
-    val currentPage = rememberSaveable { mutableStateOf(SettingsPage.Main) }
-    val showLocaleSheet = rememberSaveable { mutableStateOf(false) }
+    var currentPage by rememberSaveable { mutableStateOf(SettingsPage.Main) }
+    var showLocaleSheet by rememberSaveable { mutableStateOf(false) }
     val localeSelectorEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
     val localeLabel = remember(configuration) {
@@ -154,28 +156,28 @@ fun SettingsScreen(
         versionCode.toString()
     }
 
-    if (showLocaleSheet.value && localeSelectorEnabled) {
+    if (showLocaleSheet && localeSelectorEnabled) {
         SettingsLocaleBottomSheet(
-            setShowSheet = { showLocaleSheet.value = it },
+            onDismiss = { showLocaleSheet = false },
         )
     }
 
-    when (currentPage.value) {
+    when (currentPage) {
         SettingsPage.Main -> SettingsMainPage(
             contentPadding = contentPadding,
             localeLabel = localeLabel.takeIf { localeSelectorEnabled },
             versionLabel = versionLabel,
-            onOpenAppearance = { currentPage.value = SettingsPage.Appearance },
-            onOpenReading = { currentPage.value = SettingsPage.Reading },
-            onOpenLanguage = { showLocaleSheet.value = true },
-            onOpenAbout = { currentPage.value = SettingsPage.About },
+            onOpenAppearance = { currentPage = SettingsPage.Appearance },
+            onOpenReading = { currentPage = SettingsPage.Reading },
+            onOpenLanguage = { showLocaleSheet = true },
+            onOpenAbout = { currentPage = SettingsPage.About },
             onResetFavorites = viewModel::clearFavorites,
         )
 
         SettingsPage.Appearance -> SettingsAppearancePage(
             contentPadding = contentPadding,
             settings = settings,
-            onBack = { currentPage.value = SettingsPage.Main },
+            onBack = { currentPage = SettingsPage.Main },
             onFontScaleChange = viewModel::setFontScale,
             onThemeModeChange = viewModel::setThemeMode,
             onDynamicColorChange = viewModel::setDynamicColor,
@@ -186,7 +188,7 @@ fun SettingsScreen(
         SettingsPage.Reading -> SettingsReadingPage(
             contentPadding = contentPadding,
             settings = settings,
-            onBack = { currentPage.value = SettingsPage.Main },
+            onBack = { currentPage = SettingsPage.Main },
             onArabicFontFamilyChange = viewModel::setArabicFontFamily,
             onArabicFontScaleChange = viewModel::setArabicFontScale,
             onTransliterationFontScaleChange = viewModel::setTransliterationFontScale,
@@ -200,7 +202,7 @@ fun SettingsScreen(
             contentPadding = contentPadding,
             versionLabel = versionLabel,
             versionCodeLabel = versionCodeLabel,
-            onBack = { currentPage.value = SettingsPage.Main },
+            onBack = { currentPage = SettingsPage.Main },
         )
     }
 }
@@ -217,7 +219,7 @@ private fun SettingsMainPage(
     onOpenAbout: () -> Unit,
     onResetFavorites: () -> Unit,
 ) {
-    val showResetFavoritesDialog = rememberSaveable { mutableStateOf(false) }
+    var showResetFavoritesDialog by rememberSaveable { mutableStateOf(false) }
     val hasLanguageTile = localeLabel != null
     val appGroupCount = if (hasLanguageTile) 2 else 1
 
@@ -282,7 +284,7 @@ private fun SettingsMainPage(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
-                TextButton(onClick = { showResetFavoritesDialog.value = true }) {
+                TextButton(onClick = { showResetFavoritesDialog = true }) {
                     Text("Reset Favorites")
                 }
             }
@@ -291,9 +293,9 @@ private fun SettingsMainPage(
         item { Spacer(Modifier.height(24.dp)) }
     }
 
-    if (showResetFavoritesDialog.value) {
+    if (showResetFavoritesDialog) {
         AlertDialog(
-            onDismissRequest = { showResetFavoritesDialog.value = false },
+            onDismissRequest = { showResetFavoritesDialog = false },
             title = { Text("Reset Favorites") },
             text = {
                 Text("Are you sure you want to clear all saved favorites?")
@@ -301,7 +303,7 @@ private fun SettingsMainPage(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        showResetFavoritesDialog.value = false
+                        showResetFavoritesDialog = false
                         onResetFavorites()
                     },
                 ) {
@@ -309,7 +311,7 @@ private fun SettingsMainPage(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showResetFavoritesDialog.value = false }) {
+                TextButton(onClick = { showResetFavoritesDialog = false }) {
                     Text("Cancel")
                 }
             },
@@ -417,13 +419,13 @@ private fun SettingsReadingPage(
     onShowTranslationChange: (Boolean) -> Unit,
     onShowReferenceChange: (Boolean) -> Unit,
 ) {
-    val showArabicFontSheet = rememberSaveable { mutableStateOf(false) }
+    var showArabicFontSheet by rememberSaveable { mutableStateOf(false) }
 
-    if (showArabicFontSheet.value) {
+    if (showArabicFontSheet) {
         SettingsArabicFontBottomSheet(
             selectedFont = settings.arabicFontFamily,
             onFontSelected = onArabicFontFamilyChange,
-            setShowSheet = { showArabicFontSheet.value = it },
+            onDismiss = { showArabicFontSheet = false },
         )
     }
 
@@ -448,7 +450,7 @@ private fun SettingsReadingPage(
                     icon = { SettingsIcon(Icons.AutoMirrored.Outlined.MenuBook) },
                     title = "Arabic font",
                     subtitle = settings.arabicFontFamily.label(),
-                    onClick = { showArabicFontSheet.value = true },
+                    onClick = { showArabicFontSheet = true },
                 )
                 SettingsSliderTile(
                     shape = settingsGroupShape(1, 2),
@@ -567,9 +569,9 @@ private fun SettingsSectionLabel(text: String) {
 private fun SettingsArabicFontBottomSheet(
     selectedFont: ArabicFontFamily,
     onFontSelected: (ArabicFontFamily) -> Unit,
-    setShowSheet: (Boolean) -> Unit,
+    onDismiss: () -> Unit,
 ) {
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState()
     val fontItemColors = ListItemDefaults.colors()
     val fontItemShapes = ListItemDefaults.shapes()
@@ -577,12 +579,12 @@ private fun SettingsArabicFontBottomSheet(
     fun selectFont(fontFamily: ArabicFontFamily) {
         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
             onFontSelected(fontFamily)
-            setShowSheet(false)
+            onDismiss()
         }
     }
 
     ModalBottomSheet(
-        onDismissRequest = { setShowSheet(false) },
+        onDismissRequest = onDismiss,
         sheetState = bottomSheetState,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -637,7 +639,7 @@ private fun SettingsAboutPage(
     onBack: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
-    val showLicenseDialog = rememberSaveable { mutableStateOf(false) }
+    var showLicenseDialog by rememberSaveable { mutableStateOf(false) }
     val socialLinks = remember {
         listOf(
             AboutQuickLink(R.drawable.github, "GitHub", "https://example.com/github"),
@@ -717,7 +719,7 @@ private fun SettingsAboutPage(
                     },
                     title = "License",
                     subtitle = "GNU General Public License Version 3",
-                    onClick = { showLicenseDialog.value = true },
+                    onClick = { showLicenseDialog = true },
                 )
             }
         }
@@ -725,9 +727,9 @@ private fun SettingsAboutPage(
         item { Spacer(Modifier.height(24.dp)) }
     }
 
-    if (showLicenseDialog.value) {
+    if (showLicenseDialog) {
         AlertDialog(
-            onDismissRequest = { showLicenseDialog.value = false },
+            onDismissRequest = { showLicenseDialog = false },
             title = { Text("License") },
             text = {
                 Text(
@@ -735,7 +737,7 @@ private fun SettingsAboutPage(
                 )
             },
             confirmButton = {
-                TextButton(onClick = { showLicenseDialog.value = false }) {
+                TextButton(onClick = { showLicenseDialog = false }) {
                     Text("Close")
                 }
             },
@@ -752,10 +754,10 @@ private data class SettingsAppLocale(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SettingsLocaleBottomSheet(
-    setShowSheet: (Boolean) -> Unit,
+    onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState()
     val listState = rememberLazyListState()
     val localeManager = context.getSystemService(LocaleManager::class.java)
@@ -785,12 +787,12 @@ private fun SettingsLocaleBottomSheet(
     fun selectLocale(localeList: LocaleList) {
         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
             localeManager.applicationLocales = localeList
-            setShowSheet(false)
+            onDismiss()
         }
     }
 
     ModalBottomSheet(
-        onDismissRequest = { setShowSheet(false) },
+        onDismissRequest = onDismiss,
         sheetState = bottomSheetState,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

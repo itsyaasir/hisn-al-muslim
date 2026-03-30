@@ -5,15 +5,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.serialization.json.Json
 
-interface SeedDataSource {
-    suspend fun loadDataset(): SeedDataset
-}
-
 class AssetSeedDataSource @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val json: Json,
-) : SeedDataSource {
-    override suspend fun loadDataset(): SeedDataset {
+) {
+    suspend fun loadDataset(): SeedDataset {
         return context.assets.open(SEED_FILE_NAME).bufferedReader().use { reader ->
             json.decodeFromString<SeedDataset>(reader.readText())
         }

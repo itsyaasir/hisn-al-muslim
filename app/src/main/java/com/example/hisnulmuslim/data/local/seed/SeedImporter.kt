@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class SeedImporter @Inject constructor(
     private val database: HisnulMuslimDatabase,
-    private val seedDataSource: SeedDataSource,
+    private val seedDataSource: AssetSeedDataSource,
     private val timeProvider: TimeProvider,
 ) {
     suspend fun importIfNeeded() {

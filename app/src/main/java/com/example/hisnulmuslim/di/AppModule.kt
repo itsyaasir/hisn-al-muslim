@@ -10,12 +10,6 @@ import com.example.hisnulmuslim.data.local.dao.DhikrDao
 import com.example.hisnulmuslim.data.local.dao.FavoriteDao
 import com.example.hisnulmuslim.data.local.dao.ProgressDao
 import com.example.hisnulmuslim.data.local.db.HisnulMuslimDatabase
-import com.example.hisnulmuslim.data.local.seed.AssetSeedDataSource
-import com.example.hisnulmuslim.data.local.seed.SeedDataSource
-import com.example.hisnulmuslim.data.repository.DefaultSeedRepository
-import com.example.hisnulmuslim.data.repository.DefaultSettingsRepository
-import com.example.hisnulmuslim.data.repository.SeedRepository
-import com.example.hisnulmuslim.data.repository.SettingsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -69,16 +63,4 @@ object AppProvidesModule {
     @Provides
     @Singleton
     fun provideTimeProvider(): TimeProvider = TimeProvider(System::currentTimeMillis)
-
-    @Provides
-    @Singleton
-    fun provideSeedRepository(repository: DefaultSeedRepository): SeedRepository = repository
-
-    @Provides
-    @Singleton
-    fun provideSeedDataSource(dataSource: AssetSeedDataSource): SeedDataSource = dataSource
-
-    @Provides
-    @Singleton
-    fun provideSettingsRepository(repository: DefaultSettingsRepository): SettingsRepository = repository
 }

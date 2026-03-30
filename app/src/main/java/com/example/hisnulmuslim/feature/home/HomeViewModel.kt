@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.stateIn
 
 @Immutable
 data class HomeUiState(
-    val isLoaded: Boolean = false,
     val collections: List<Collection> = emptyList(),
     val dailyHighlight: Dhikr? = null,
 )
@@ -30,7 +29,6 @@ class HomeViewModel @Inject constructor(
         repository.observeDailyHighlight(),
     ) { collections, dailyHighlight ->
         HomeUiState(
-            isLoaded = true,
             collections = collections,
             dailyHighlight = dailyHighlight,
         )

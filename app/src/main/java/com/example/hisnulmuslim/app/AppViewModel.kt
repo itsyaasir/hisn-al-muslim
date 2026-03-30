@@ -3,8 +3,8 @@ package com.example.hisnulmuslim.app
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hisnulmuslim.data.repository.DhikrRepository
-import com.example.hisnulmuslim.data.repository.SeedRepository
 import com.example.hisnulmuslim.data.repository.SettingsRepository
+import com.example.hisnulmuslim.data.local.seed.SeedImporter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class AppViewModel @Inject constructor(
     private val dhikrRepository: DhikrRepository,
-    seedRepository: SeedRepository,
+    seedImporter: SeedImporter,
     settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
@@ -26,7 +26,7 @@ class AppViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            seedRepository.ensureSeeded()
+            seedImporter.importIfNeeded()
             dhikrRepository.observeCollections().first()
             dhikrRepository.observeDailyHighlight().first()
             isReady.value = true
