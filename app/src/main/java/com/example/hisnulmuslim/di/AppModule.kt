@@ -14,8 +14,6 @@ import com.example.hisnulmuslim.data.local.seed.AssetSeedDataSource
 import com.example.hisnulmuslim.data.local.seed.SeedDataSource
 import com.example.hisnulmuslim.data.repository.DefaultSeedRepository
 import com.example.hisnulmuslim.data.repository.DefaultSettingsRepository
-import com.example.hisnulmuslim.data.repository.DhikrRepository
-import com.example.hisnulmuslim.data.repository.OfflineFirstDhikrRepository
 import com.example.hisnulmuslim.data.repository.SeedRepository
 import com.example.hisnulmuslim.data.repository.SettingsRepository
 import dagger.Binds
@@ -77,11 +75,6 @@ object AppProvidesModule {
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AppBindsModule {
-
-    @Binds
-    abstract fun bindDhikrRepository(
-        repository: OfflineFirstDhikrRepository,
-    ): DhikrRepository
 
     @Binds
     abstract fun bindSeedRepository(

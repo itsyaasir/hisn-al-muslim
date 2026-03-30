@@ -69,6 +69,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -434,43 +435,6 @@ private fun SettingsReadingPage(
         item { Spacer(Modifier.height(14.dp)) }
 
         item {
-            SettingsSectionLabel("Content")
-        }
-
-        item { Spacer(Modifier.height(8.dp)) }
-
-        item {
-            SettingsGroup {
-                SettingsSwitchTile(
-                    shape = settingsGroupShape(0, 3),
-                    icon = { SettingsIcon(Icons.Outlined.Translate) },
-                    title = "Show transliteration",
-                    subtitle = "Show pronunciation guidance.",
-                    checked = settings.showTransliteration,
-                    onCheckedChange = onShowTransliterationChange,
-                )
-                SettingsSwitchTile(
-                    shape = settingsGroupShape(1, 3),
-                    icon = { SettingsIcon(Icons.Outlined.Translate) },
-                    title = "Show translation",
-                    subtitle = "Show translated meaning.",
-                    checked = settings.showTranslation,
-                    onCheckedChange = onShowTranslationChange,
-                )
-                SettingsSwitchTile(
-                    shape = settingsGroupShape(2, 3),
-                    icon = { SettingsIcon(Icons.Outlined.Visibility) },
-                    title = "Show reference",
-                    subtitle = "Show source and notes.",
-                    checked = settings.showReference,
-                    onCheckedChange = onShowReferenceChange,
-                )
-            }
-        }
-
-        item { Spacer(Modifier.height(12.dp)) }
-
-        item {
             SettingsSectionLabel("Arabic")
         }
 
@@ -501,22 +465,52 @@ private fun SettingsReadingPage(
         item { Spacer(Modifier.height(12.dp)) }
 
         item {
-            SettingsSectionLabel("Supporting text")
+            SettingsSectionLabel("Transliteration")
         }
 
         item { Spacer(Modifier.height(8.dp)) }
 
         item {
             SettingsGroup {
-                SettingsSliderTile(
+                SettingsSwitchTile(
                     shape = settingsGroupShape(0, 2),
+                    icon = { SettingsIcon(Icons.Outlined.Translate) },
+                    title = "Transliteration",
+                    subtitle = "Show pronunciation guidance.",
+                    checked = settings.showTransliteration,
+                    onCheckedChange = onShowTransliterationChange,
+                )
+                SettingsSliderTile(
+                    shape = settingsGroupShape(1, 2),
                     icon = { SettingsIcon(Icons.Outlined.Translate) },
                     title = "Transliteration size",
                     subtitle = "Adjust transliteration size.",
                     value = settings.transliterationFontScale,
                     valueRange = 0.9f..1.4f,
                     valueLabel = multiplierLabel(settings.transliterationFontScale),
+                    enabled = settings.showTransliteration,
                     onValueChange = onTransliterationFontScaleChange,
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        item {
+            SettingsSectionLabel("Translation")
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
+            SettingsGroup {
+                SettingsSwitchTile(
+                    shape = settingsGroupShape(0, 2),
+                    icon = { SettingsIcon(Icons.Outlined.Translate) },
+                    title = "Translation",
+                    subtitle = "Show translated meaning.",
+                    checked = settings.showTranslation,
+                    onCheckedChange = onShowTranslationChange,
                 )
                 SettingsSliderTile(
                     shape = settingsGroupShape(1, 2),
@@ -526,7 +520,29 @@ private fun SettingsReadingPage(
                     value = settings.translationFontScale,
                     valueRange = 0.9f..1.4f,
                     valueLabel = multiplierLabel(settings.translationFontScale),
+                    enabled = settings.showTranslation,
                     onValueChange = onTranslationFontScaleChange,
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        item {
+            SettingsSectionLabel("Reference")
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
+            SettingsGroup {
+                SettingsSwitchTile(
+                    shape = settingsGroupShape(0, 1),
+                    icon = { SettingsIcon(Icons.Outlined.Visibility) },
+                    title = "Reference",
+                    subtitle = "Show source and notes.",
+                    checked = settings.showReference,
+                    onCheckedChange = onShowReferenceChange,
                 )
             }
         }
@@ -1096,10 +1112,15 @@ private fun SettingsSliderTile(
     value: Float,
     valueRange: ClosedFloatingPointRange<Float>,
     valueLabel: String,
+    enabled: Boolean = true,
     onValueChange: (Float) -> Unit,
 ) {
     SettingsStaticTile(shape = shape) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .alpha(if (enabled) 1f else 0.56f),
+        ) {
             Row(
                 modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -1135,6 +1156,7 @@ private fun SettingsSliderTile(
                 Slider(
                     value = value,
                     onValueChange = onValueChange,
+                    enabled = enabled,
                     valueRange = valueRange,
                     modifier = Modifier.weight(1f),
                 )
