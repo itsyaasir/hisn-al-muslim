@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.hisnulmuslim"
+    namespace = "com.yasir.hisnulmuslim"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.hisnulmuslim"
+        applicationId = "com.yasir.hisnulmuslim"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
