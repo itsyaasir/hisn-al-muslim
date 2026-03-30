@@ -125,7 +125,8 @@ fun DhikrDetailScreen(
     val pagerState = rememberPagerState(pageCount = { uiState.collectionDhikr.size })
     val pageScrollStates = remember(uiState.collectionDhikr.size) { mutableStateMapOf<Int, ScrollState>() }
     val headerTitle = uiState.dhikr?.displayCollectionTitle(uiState.settings).orEmpty()
-    val headerTitleFont = if (uiState.settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC) {
+    val isArabicHeaderTitle = uiState.settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC
+    val headerTitleFont = if (isArabicHeaderTitle) {
         arabicFont
     } else {
         topBarTitleFont
@@ -191,6 +192,7 @@ fun DhikrDetailScreen(
                 DetailScrollableHeader(
                     title = headerTitle,
                     fontFamily = headerTitleFont,
+                    isArabicTitle = isArabicHeaderTitle,
                     onBack = onBack,
                     isFavorite = uiState.isFavorite,
                     onToggleFavorite = { viewModel.toggleFavorite() },
@@ -428,6 +430,7 @@ fun DhikrDetailScreen(
 private fun DetailScrollableHeader(
     title: String,
     fontFamily: FontFamily,
+    isArabicTitle: Boolean,
     onBack: () -> Unit,
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
@@ -436,6 +439,15 @@ private fun DetailScrollableHeader(
     modifier: Modifier = Modifier,
 ) {
     var actionsExpanded by remember { mutableStateOf(false) }
+    val titleStyle = if (isArabicTitle) {
+        MaterialTheme.typography.headlineSmall.copy(
+            fontFamily = fontFamily,
+            fontSize = MaterialTheme.typography.headlineSmall.fontSize * 1.06f,
+            lineHeight = MaterialTheme.typography.headlineSmall.lineHeight * 1.06f,
+        )
+    } else {
+        MaterialTheme.typography.headlineSmall.copy(fontFamily = fontFamily)
+    }
 
     Row(
         modifier = modifier,
@@ -448,15 +460,26 @@ private fun DetailScrollableHeader(
                 contentDescription = "Back",
             )
         }
-        Text(
-            text = title,
-            modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontFamily = fontFamily,
-            ),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        if (isArabicTitle) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Text(
+                    text = title,
+                    modifier = Modifier.weight(1f),
+                    style = titleStyle,
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        } else {
+            Text(
+                text = title,
+                modifier = Modifier.weight(1f),
+                style = titleStyle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         IconButton(onClick = onToggleFavorite) {
             Icon(
                 imageVector = if (isFavorite) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder,

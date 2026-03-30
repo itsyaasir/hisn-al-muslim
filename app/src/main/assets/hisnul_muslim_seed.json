@@ -1,802 +1,802 @@
 {
-  "seedVersion": 7,
+  "seedVersion": 8,
   "categories": [
     {
       "id": 1,
       "title": "Words of remembrance for morning",
-      "subtitle": "أذكار الصباح",
+      "subtitle": "أَذْكَارُ الصَّبَاحِ",
       "orderIndex": 1
     },
     {
       "id": 2,
       "title": "Words of remembrance for evening",
-      "subtitle": "أذكار المساء",
+      "subtitle": "أَذْكَارُ المَسَاءِ",
       "orderIndex": 2
     },
     {
       "id": 3,
       "title": "What to say after completing the prayer",
-      "subtitle": "الأذكار بعد السلام من الصلاة",
+      "subtitle": "الأَذْكَارُ بَعْدَ السَّلَامِ مِنَ الصَّلَاةِ",
       "orderIndex": 3
     },
     {
       "id": 4,
       "title": "What to say before sleeping",
-      "subtitle": "أذكار النوم",
+      "subtitle": "أَذْكَارُ النَّوْمِ",
       "orderIndex": 4
     },
     {
       "id": 5,
       "title": "supplications for when you wake up",
-      "subtitle": "أذكار الاستيقاظ من النوم",
+      "subtitle": "أَذْكَارُ الِاسْتِيقَاظِ مِنَ النَّوْمِ",
       "orderIndex": 5
     },
     {
       "id": 6,
       "title": "Invocation when getting dressed",
-      "subtitle": "دعاء لبس الثوب",
+      "subtitle": "دُعَاءُ لُبْسِ الثَّوْبِ",
       "orderIndex": 6
     },
     {
       "id": 7,
       "title": "Invocation when putting on new clothes",
-      "subtitle": "دعاء لبس الثوب الجديد",
+      "subtitle": "دُعَاءُ لُبْسِ الثَّوْبِ الجَدِيدِ",
       "orderIndex": 7
     },
     {
       "id": 8,
       "title": "Invocations for someone who has put on new clothes",
-      "subtitle": "الدعاء لمن لبس ثوباً جديداً",
+      "subtitle": "الدُّعَاءُ لِمَنْ لَبِسَ ثَوْبًا جَدِيدًا",
       "orderIndex": 8
     },
     {
       "id": 9,
       "title": "What to say when undressing",
-      "subtitle": "ما يقول إذا وضع ثوبه",
+      "subtitle": "مَا يَقُولُ إِذَا وَضَعَ ثَوْبَهُ",
       "orderIndex": 9
     },
     {
       "id": 10,
       "title": "Invocation for entering the restroom",
-      "subtitle": "دعاء دخول الخلاء",
+      "subtitle": "دُعَاءُ دُخُولِ الخَلَاءِ",
       "orderIndex": 10
     },
     {
       "id": 11,
       "title": "Invocation for leaving the restroom",
-      "subtitle": "دعاء الخروج من الخلاء",
+      "subtitle": "دُعَاءُ الخُرُوجِ مِنَ الخَلَاءِ",
       "orderIndex": 11
     },
     {
       "id": 12,
       "title": "What to say before performing ablution",
-      "subtitle": "الذكر قبل الوضوء",
+      "subtitle": "الذِّكْرُ قَبْلَ الوُضُوءِ",
       "orderIndex": 12
     },
     {
       "id": 13,
       "title": "What to say upon completing ablution",
-      "subtitle": "الذكر بعد الفراغ من الوضوء",
+      "subtitle": "الذِّكْرُ بَعْدَ الفَرَاغِ مِنَ الوُضُوءِ",
       "orderIndex": 13
     },
     {
       "id": 14,
       "title": "What to say when leaving the home",
-      "subtitle": "الذكر عند الخروج من المنزل",
+      "subtitle": "الذِّكْرُ عِنْدَ الخُرُوجِ مِنَ المَنْزِلِ",
       "orderIndex": 14
     },
     {
       "id": 15,
       "title": "What to say when entering the home",
-      "subtitle": "الذكر عند دخول المنزل",
+      "subtitle": "الذِّكْرُ عِنْدَ دُخُولِ المَنْزِلِ",
       "orderIndex": 15
     },
     {
       "id": 16,
       "title": "Invocation for going to the mosque",
-      "subtitle": "دعاء الذهاب إلى المسجد",
+      "subtitle": "دُعَاءُ الذَّهَابِ إِلَى المَسْجِدِ",
       "orderIndex": 16
     },
     {
       "id": 17,
       "title": "Invocation for entering the mosque",
-      "subtitle": "دعاء دخول المسجد",
+      "subtitle": "دُعَاءُ دُخُولِ المَسْجِدِ",
       "orderIndex": 17
     },
     {
       "id": 18,
       "title": "Invocation for leaving the mosque",
-      "subtitle": "دعاء الخروج من المسجد",
+      "subtitle": "دُعَاءُ الخُرُوجِ مِنَ المَسْجِدِ",
       "orderIndex": 18
     },
     {
       "id": 19,
       "title": "What to say upon hearing the Athan (call to prayer)",
-      "subtitle": "أذكار الأذان",
+      "subtitle": "أَذْكَارُ الأَذَانِ",
       "orderIndex": 19
     },
     {
       "id": 20,
       "title": "Invocations for the beginning of the prayer",
-      "subtitle": "دعاء الاستفتاح",
+      "subtitle": "دُعَاءُ الِاسْتِفْتَاحِ",
       "orderIndex": 20
     },
     {
       "id": 21,
       "title": "Invocations during Ruki' (bowing in prayer)",
-      "subtitle": "دعاء الركوع",
+      "subtitle": "دُعَاءُ الرُّكُوعِ",
       "orderIndex": 21
     },
     {
       "id": 22,
       "title": "Invocations for rising from the Ruki'",
-      "subtitle": "دعاء الرفع من الركوع",
+      "subtitle": "دُعَاءُ الرَّفْعِ مِنَ الرُّكُوعِ",
       "orderIndex": 22
     },
     {
       "id": 23,
       "title": "Invocations during Sujood",
-      "subtitle": "دعاء السجود",
+      "subtitle": "دُعَاءُ السُّجُودِ",
       "orderIndex": 23
     },
     {
       "id": 24,
       "title": "Invocations for sitting between two prostrations",
-      "subtitle": "دعاء الجلسة بين السجدتين",
+      "subtitle": "دُعَاءُ الجَلْسَةِ بَيْنَ السَّجْدَتَيْنِ",
       "orderIndex": 24
     },
     {
       "id": 25,
       "title": "Supplications for prostrating due to recitation of the Qur'an",
-      "subtitle": "دعاء سجود التلاوة",
+      "subtitle": "دُعَاءُ سُجُودِ التِّلَاوَةِ",
       "orderIndex": 25
     },
     {
       "id": 26,
       "title": "Invocation for At-Tashahhud (sitting in prayer)",
-      "subtitle": "التشهد",
+      "subtitle": "التَّشَهُّدُ",
       "orderIndex": 26
     },
     {
       "id": 27,
       "title": "How to recite blessings on the Prophet after the Tashahhud",
-      "subtitle": "الصلاة على النبي بعد التشهد",
+      "subtitle": "الصَّلَاةُ عَلَى النَّبِيِّ بَعْدَ التَّشَهُّدِ",
       "orderIndex": 27
     },
     {
       "id": 28,
       "title": "Invocations after the final Tash-ahhud and before ending the prayer",
-      "subtitle": "الدعاء بعد التشهد الأخير قبل السلام",
+      "subtitle": "الدُّعَاءُ بَعْدَ التَّشَهُّدِ الأَخِيرِ قَبْلَ السَّلَامِ",
       "orderIndex": 28
     },
     {
       "id": 29,
       "title": "Istikharah (seeking Allah's Counsel)",
-      "subtitle": "دعاء صلاة الاستخارة",
+      "subtitle": "دُعَاءُ صَلَاةِ الِاسْتِخَارَةِ",
       "orderIndex": 29
     },
     {
       "id": 30,
       "title": "Invocation to say if you stir in the night",
-      "subtitle": "الدعاء إذا تقلب ليلاً",
+      "subtitle": "الدُّعَاءُ إِذَا تَقَلَّبَ لَيْلًا",
       "orderIndex": 30
     },
     {
       "id": 31,
       "title": "What to say if you are afraid to go to sleep or feel lonely and depressed",
-      "subtitle": "دعاء الفزع في النوم ومن بُلِيَ بالوحشة",
+      "subtitle": "دُعَاءُ الفَزَعِ فِي النَّوْمِ وَمَنْ بُلِيَ بِالوَحْشَةِ",
       "orderIndex": 31
     },
     {
       "id": 32,
       "title": "What to do if you have a bad dream or nightmare",
-      "subtitle": "ما يفعل من رأى الرؤيا أو الحلم",
+      "subtitle": "مَا يَفْعَلُ مَنْ رَأَى الرُّؤْيَا أَوِ الحُلْمَ",
       "orderIndex": 32
     },
     {
       "id": 33,
       "title": "Invocations for Qunut in the Witr prayer",
-      "subtitle": "دعاء قنوت الوتر",
+      "subtitle": "دُعَاءُ قُنُوتِ الوِتْرِ",
       "orderIndex": 33
     },
     {
       "id": 34,
       "title": "What to say immediately following the Witr prayer",
-      "subtitle": "الذكر عقب السلام من الوتر",
+      "subtitle": "الذِّكْرُ عَقِبَ السَّلَامِ مِنَ الوِتْرِ",
       "orderIndex": 34
     },
     {
       "id": 35,
       "title": "Invocations in times of worry and grief",
-      "subtitle": "دعاء الهم والحزن",
+      "subtitle": "دُعَاءُ الهَمِّ وَالحُزْنِ",
       "orderIndex": 35
     },
     {
       "id": 36,
       "title": "Invocations for anguish",
-      "subtitle": "دعاء الكرب",
+      "subtitle": "دُعَاءُ الكَرْبِ",
       "orderIndex": 36
     },
     {
       "id": 37,
       "title": "Invocations for when you meet an adversary or a powerful ruler.",
-      "subtitle": "دعاء لقاء العدو وذي السلطان",
+      "subtitle": "دُعَاءُ لِقَاءِ العَدُوِّ وَذِي السُّلْطَانِ",
       "orderIndex": 37
     },
     {
       "id": 38,
       "title": "Invocations against the oppression of rulers",
-      "subtitle": "دعاء من خاف ظلم السلطان",
+      "subtitle": "دُعَاءُ مَنْ خَافَ ظُلْمَ السُّلْطَانِ",
       "orderIndex": 38
     },
     {
       "id": 39,
       "title": "Invocation against an enemy",
-      "subtitle": "الدعاء على العدو",
+      "subtitle": "الدُّعَاءُ عَلَى العَدُوِّ",
       "orderIndex": 39
     },
     {
       "id": 40,
       "title": "What to say if you fear people may harm you",
-      "subtitle": "ما يقول من خاف قوماً",
+      "subtitle": "مَا يَقُولُ مَنْ خَافَ قَوْمًا",
       "orderIndex": 40
     },
     {
       "id": 41,
       "title": "Invocations for if you are stricken by in your faith",
-      "subtitle": "دعاء من أصابه وسوسة في الإيمان",
+      "subtitle": "دُعَاءُ مَنْ أَصَابَهُ وَسْوَسَةٌ فِي الإِيمَانِ",
       "orderIndex": 41
     },
     {
       "id": 42,
       "title": "Invocations for the setting of a debt",
-      "subtitle": "دعاء قضاء الدين",
+      "subtitle": "دُعَاءُ قَضَاءِ الدَّيْنِ",
       "orderIndex": 42
     },
     {
       "id": 43,
       "title": "Invocation against the distractions of Satan during the prayer and recitation of the Quran",
-      "subtitle": "دعاء الوسوسة في الصلاة والقراءة",
+      "subtitle": "دُعَاءُ الوَسْوَسَةِ فِي الصَّلَاةِ وَالقِرَاءَةِ",
       "orderIndex": 43
     },
     {
       "id": 44,
       "title": "Invocation for when you find something becoming difficult for you",
-      "subtitle": "دعاء من استصعب عليه أمر",
+      "subtitle": "دُعَاءُ مَنِ اسْتَصْعَبَ عَلَيْهِ أَمْرٌ",
       "orderIndex": 44
     },
     {
       "id": 45,
       "title": "What to say and do if you commit a sin",
-      "subtitle": "ما يقول ويفعل من أذنب ذنباً",
+      "subtitle": "مَا يَقُولُ وَيَفْعَلُ مَنْ أَذْنَبَ ذَنْبًا",
       "orderIndex": 45
     },
     {
       "id": 46,
       "title": "Invocations against the Devil and his promptings",
-      "subtitle": "دعاء طرد الشيطان ووساوسه",
+      "subtitle": "دُعَاءُ طَرْدِ الشَّيْطَانِ وَوَسَاوِسِهِ",
       "orderIndex": 46
     },
     {
       "id": 47,
       "title": "Invocation for when something you dislike happens, or for when you fail to achieve what you attempt to do",
-      "subtitle": "الدعاء حينما يقع ما لا يرضاه أو غلب على أمره",
+      "subtitle": "الدُّعَاءُ حِينَمَا يَقَعُ مَا لَا يَرْضَاهُ أَوْ غُلِبَ عَلَى أَمْرِهِ",
       "orderIndex": 47
     },
     {
       "id": 48,
       "title": "Congratulations for new parents and how they should respond",
-      "subtitle": "ﺗﻬنئة المولود له وجوابه",
+      "subtitle": "تَهْنِئَةُ المَوْلُودِ لَهُ وَجَوَابُهُ",
       "orderIndex": 48
     },
     {
       "id": 49,
       "title": "How to seek Allah's protection for children",
-      "subtitle": "ما يعوذ به الأولاد",
+      "subtitle": "مَا يُعَوَّذُ بِهِ الأَوْلَادُ",
       "orderIndex": 49
     },
     {
       "id": 50,
       "title": "Invocations for visiting the sick",
-      "subtitle": "الدعاء للمريض في عيادته",
+      "subtitle": "الدُّعَاءُ لِلْمَرِيضِ فِي عِيَادَتِهِ",
       "orderIndex": 50
     },
     {
       "id": 51,
       "title": "The reward for visiting the sick",
-      "subtitle": "فضل عيادة المريض",
+      "subtitle": "فَضْلُ عِيَادَةِ المَرِيضِ",
       "orderIndex": 51
     },
     {
       "id": 52,
       "title": "Invocations of the terminal ill",
-      "subtitle": "دعاء المريض الذي يئس من حياته",
+      "subtitle": "دُعَاءُ المَرِيضِ الَّذِي يَئِسَ مِنْ حَيَاتِهِ",
       "orderIndex": 52
     },
     {
       "id": 53,
       "title": "What to encourage the dying person to say",
-      "subtitle": "تلقين المحتضر",
+      "subtitle": "تَلْقِينُ المُحْتَضَرِ",
       "orderIndex": 53
     },
     {
       "id": 54,
       "title": "Invocation for when tragedy strikes",
-      "subtitle": "دعاء من أصيب بمصيبة",
+      "subtitle": "دُعَاءُ مَنْ أُصِيبَ بِمُصِيبَةٍ",
       "orderIndex": 54
     },
     {
       "id": 55,
       "title": "Invocation for closing the eyes of the dead",
-      "subtitle": "الدعاء عند إغماض الميت",
+      "subtitle": "الدُّعَاءُ عِنْدَ إِغْمَاضِ المَيِّتِ",
       "orderIndex": 55
     },
     {
       "id": 56,
       "title": "Invocations for the dead in the Funeral prayer",
-      "subtitle": "الدعاء للميت في الصلاة عليه",
+      "subtitle": "الدُّعَاءُ لِلْمَيِّتِ فِي الصَّلَاةِ عَلَيْهِ",
       "orderIndex": 56
     },
     {
       "id": 57,
       "title": "Invocations for a child in the Funeral prayer",
-      "subtitle": "الدعاء للفرط في الصلاة عليه",
+      "subtitle": "الدُّعَاءُ لِلْفَرَطِ فِي الصَّلَاةِ عَلَيْهِ",
       "orderIndex": 57
     },
     {
       "id": 58,
       "title": "Invocation for the bereaved",
-      "subtitle": "دعاء التعزية",
+      "subtitle": "دُعَاءُ التَّعْزِيَةِ",
       "orderIndex": 58
     },
     {
       "id": 59,
       "title": "Invocation to be recited when placing the dead in his grave",
-      "subtitle": "الدعاء عند إدخال الميت القبر",
+      "subtitle": "الدُّعَاءُ عِنْدَ إِدْخَالِ المَيِّتِ القَبْرَ",
       "orderIndex": 59
     },
     {
       "id": 60,
       "title": "Invocation to be recited after burying the dead",
-      "subtitle": "الدعاء بعد دفن الميت",
+      "subtitle": "الدُّعَاءُ بَعْدَ دَفْنِ المَيِّتِ",
       "orderIndex": 60
     },
     {
       "id": 61,
       "title": "Invocation for visiting the graves",
-      "subtitle": "دعاء زيارة القبور",
+      "subtitle": "دُعَاءُ زِيَارَةِ القُبُورِ",
       "orderIndex": 61
     },
     {
       "id": 62,
       "title": "Invocations for when the wind blows",
-      "subtitle": "دعاء الريح",
+      "subtitle": "دُعَاءُ الرِّيحِ",
       "orderIndex": 62
     },
     {
       "id": 63,
       "title": "Invocation for when it thunder",
-      "subtitle": "دعاء الرعد",
+      "subtitle": "دُعَاءُ الرَّعْدِ",
       "orderIndex": 63
     },
     {
       "id": 64,
       "title": "Some invocations for rain",
-      "subtitle": "من أدعية الاستسقاء",
+      "subtitle": "مِنْ أَدْعِيَةِ الِاسْتِسْقَاءِ",
       "orderIndex": 64
     },
     {
       "id": 65,
       "title": "Invocation for when it rains",
-      "subtitle": "الدعاء إذا نزل المطر",
+      "subtitle": "الدُّعَاءُ إِذَا نَزَلَ المَطَرُ",
       "orderIndex": 65
     },
     {
       "id": 66,
       "title": "Supplication after it rains",
-      "subtitle": "الذكر بعد نزول المطر",
+      "subtitle": "الذِّكْرُ بَعْدَ نُزُولِ المَطَرِ",
       "orderIndex": 66
     },
     {
       "id": 67,
       "title": "Invocation for the withholding of the rain",
-      "subtitle": "من أدعية الاستصحاء",
+      "subtitle": "مِنْ أَدْعِيَةِ الِاسْتِصْحَاءِ",
       "orderIndex": 67
     },
     {
       "id": 68,
       "title": "Invocation for sighting the new moon",
-      "subtitle": "دعاء رؤية الهلال",
+      "subtitle": "دُعَاءُ رُؤْيَةِ الهِلَالِ",
       "orderIndex": 68
     },
     {
       "id": 69,
       "title": "Invocations for breaking the fast",
-      "subtitle": "الدعاء عند إفطار الصائم",
+      "subtitle": "الدُّعَاءُ عِنْدَ إِفْطَارِ الصَّائِمِ",
       "orderIndex": 69
     },
     {
       "id": 70,
       "title": "Invocations before eating",
-      "subtitle": "الدعاء قبل الطعام",
+      "subtitle": "الدُّعَاءُ قَبْلَ الطَّعَامِ",
       "orderIndex": 70
     },
     {
       "id": 71,
       "title": "Invocations after eating",
-      "subtitle": "الدعاء عند الفراغ من الطعام",
+      "subtitle": "الدُّعَاءُ عِنْدَ الفَرَاغِ مِنَ الطَّعَامِ",
       "orderIndex": 71
     },
     {
       "id": 72,
       "title": "A dinner guest's invocation for his host",
-      "subtitle": "دعاء الضيف لصاحب الطعام",
+      "subtitle": "دُعَاءُ الضَّيْفِ لِصَاحِبِ الطَّعَامِ",
       "orderIndex": 72
     },
     {
       "id": 73,
       "title": "Invocation for someone who gives you drink or offers it to you",
-      "subtitle": "التعريض بالدعاء لطلب الطعام أو الشراب",
+      "subtitle": "التَّعْرِيضُ بِالدُّعَاءِ لِطَلَبِ الطَّعَامِ أَوِ الشَّرَابِ",
       "orderIndex": 73
     },
     {
       "id": 74,
       "title": "Invocation for a family who invites you to break your fast with them",
-      "subtitle": "الدعاء إذا أفطر عند أهل بيت",
+      "subtitle": "الدُّعَاءُ إِذَا أَفْطَرَ عِنْدَ أَهْلِ بَيْتٍ",
       "orderIndex": 74
     },
     {
       "id": 75,
       "title": "Invocation for someone who offers you food when you are fasting, which you decline",
-      "subtitle": "دعاء الصائم إذا حضر الطعام ولم يفطر",
+      "subtitle": "دُعَاءُ الصَّائِمِ إِذَا حَضَرَ الطَّعَامَ وَلَمْ يُفْطِرْ",
       "orderIndex": 75
     },
     {
       "id": 76,
       "title": "What to say when you are fasting and someone is rude to you",
-      "subtitle": "ما يقول الصائم إذا سابه أحد",
+      "subtitle": "مَا يَقُولُ الصَّائِمُ إِذَا سَابَّهُ أَحَدٌ",
       "orderIndex": 76
     },
     {
       "id": 77,
       "title": "Invocation for when you see the first dates of the season",
-      "subtitle": "الدعاء عند رؤية باكورة الثمر",
+      "subtitle": "الدُّعَاءُ عِنْدَ رُؤْيَةِ بَاكُورَةِ الثَّمَرِ",
       "orderIndex": 77
     },
     {
       "id": 78,
       "title": "Invocation for sneezing",
-      "subtitle": "دعاء العطاس",
+      "subtitle": "دُعَاءُ العُطَاسِ",
       "orderIndex": 78
     },
     {
       "id": 79,
       "title": "What to say to the disbeliever if he sneezes and praises Allah",
-      "subtitle": "ما يقال للكافر إذا عطس فحمد الله",
+      "subtitle": "مَا يُقَالُ لِلْكَافِرِ إِذَا عَطَسَ فَحَمِدَ اللهَ",
       "orderIndex": 79
     },
     {
       "id": 80,
       "title": "Invocation for the groom",
-      "subtitle": "الدعاء للمتزوج",
+      "subtitle": "الدُّعَاءُ لِلْمُتَزَوِّجِ",
       "orderIndex": 80
     },
     {
       "id": 81,
       "title": "The groom’s supplication on the wedding night or when buying an animal",
-      "subtitle": "دعاء المتزوج وشراء الدابة",
+      "subtitle": "دُعَاءُ المُتَزَوِّجِ وَشِرَاءِ الدَّابَّةِ",
       "orderIndex": 81
     },
     {
       "id": 82,
       "title": "Invocation to be recited before intercourse",
-      "subtitle": "الدعاء قبل إتيان الزوجة",
+      "subtitle": "الدُّعَاءُ قَبْلَ إِتْيَانِ الزَّوْجَةِ",
       "orderIndex": 82
     },
     {
       "id": 83,
       "title": "Invocation for anger",
-      "subtitle": "دعاء الغضب",
+      "subtitle": "دُعَاءُ الغَضَبِ",
       "orderIndex": 83
     },
     {
       "id": 84,
       "title": "What to say if you see someone afflicted by misfortune",
-      "subtitle": "دعاء من رأى مبتلى",
+      "subtitle": "دُعَاءُ مَنْ رَأَى مُبْتَلًى",
       "orderIndex": 84
     },
     {
       "id": 85,
       "title": "What to say while sitting in an assembly",
-      "subtitle": "ما يقال في المجلس",
+      "subtitle": "مَا يُقَالُ فِي المَجْلِسِ",
       "orderIndex": 85
     },
     {
       "id": 86,
       "title": "The Expiation of Assembly - Kaffaratul-Majlis",
-      "subtitle": "كفارة المجلس",
+      "subtitle": "كَفَّارَةُ المَجْلِسِ",
       "orderIndex": 86
     },
     {
       "id": 87,
       "title": "vocation for someone who says: May Allah forgive you",
-      "subtitle": "الدعاء لمن قال غفر الله لك",
+      "subtitle": "الدُّعَاءُ لِمَنْ قَالَ غَفَرَ اللهُ لَكَ",
       "orderIndex": 87
     },
     {
       "id": 88,
       "title": "Invocation for someone who does good to you",
-      "subtitle": "الدعاء لمن صنع إليك معروفاً",
+      "subtitle": "الدُّعَاءُ لِمَنْ صَنَعَ إِلَيْكَ مَعْرُوفًا",
       "orderIndex": 88
     },
     {
       "id": 89,
       "title": "Invocation for Allah's protection from the False Messiah",
-      "subtitle": "ما يعصم الله به من الدجال",
+      "subtitle": "مَا يَعْصِمُ اللهُ بِهِ مِنَ الدَّجَّالِ",
       "orderIndex": 89
     },
     {
       "id": 90,
       "title": "Invocation for someone who tells you I love you for the sake of Allah",
-      "subtitle": "الدعاء لمن قال إني أحبك في الله",
+      "subtitle": "الدُّعَاءُ لِمَنْ قَالَ إِنِّي أُحِبُّكَ فِي اللهِ",
       "orderIndex": 90
     },
     {
       "id": 91,
       "title": "Invocation for someone who offers you a share of his wealth",
-      "subtitle": "الدعاء لمن عرض عليك ماله",
+      "subtitle": "الدُّعَاءُ لِمَنْ عَرَضَ عَلَيْكَ مَالَهُ",
       "orderIndex": 91
     },
     {
       "id": 92,
       "title": "Invocation (upon receipt of the loan) for someone who lends you money",
-      "subtitle": "الدعاء لمن أقرض عند القضاء",
+      "subtitle": "الدُّعَاءُ لِمَنْ أَقْرَضَ عِنْدَ القَضَاءِ",
       "orderIndex": 92
     },
     {
       "id": 93,
       "title": "Invocation for fear of Shirk",
-      "subtitle": "دعاء الخوف من الشرك",
+      "subtitle": "دُعَاءُ الخَوْفِ مِنَ الشِّرْكِ",
       "orderIndex": 93
     },
     {
       "id": 94,
       "title": "Invocation for someone who tells you: May Allah bless you",
-      "subtitle": "الدعاء لمن قال بارك الله فيك",
+      "subtitle": "الدُّعَاءُ لِمَنْ قَالَ بَارَكَ اللهُ فِيكَ",
       "orderIndex": 94
     },
     {
       "id": 95,
       "title": "Invocation against evil portent",
-      "subtitle": "دعاء كراهية الطيرة",
+      "subtitle": "دُعَاءُ كَرَاهِيَةِ الطِّيَرَةِ",
       "orderIndex": 95
     },
     {
       "id": 96,
       "title": "Invocation for riding in a vehicle or on an animal",
-      "subtitle": "دعاء الركوب",
+      "subtitle": "دُعَاءُ الرُّكُوبِ",
       "orderIndex": 96
     },
     {
       "id": 97,
       "title": "Invocation for traveling",
-      "subtitle": "دعاء السفر",
+      "subtitle": "دُعَاءُ السَّفَرِ",
       "orderIndex": 97
     },
     {
       "id": 98,
       "title": "Invocation for entering a town or city",
-      "subtitle": "دعاء دخول القرية أو البلدة",
+      "subtitle": "دُعَاءُ دُخُولِ القَرْيَةِ أَوِ البَلْدَةِ",
       "orderIndex": 98
     },
     {
       "id": 99,
       "title": "Invocation for entering a market",
-      "subtitle": "دعاء دخول السوق",
+      "subtitle": "دُعَاءُ دُخُولِ السُّوقِ",
       "orderIndex": 99
     },
     {
       "id": 100,
       "title": "Invocation for when your vehicle or mount begins to fail",
-      "subtitle": "الدعاء إذا تعس المركوب",
+      "subtitle": "الدُّعَاءُ إِذَا تَعِسَ المَرْكُوبُ",
       "orderIndex": 100
     },
     {
       "id": 101,
       "title": " The traveler's invocation for the one he leaves behind",
-      "subtitle": "دعاء المسافر للمقيم",
+      "subtitle": "دُعَاءُ المُسَافِرِ لِلْمُقِيمِ",
       "orderIndex": 101
     },
     {
       "id": 102,
       "title": "The resident's invocations for the traveler",
-      "subtitle": "دعاء المقيم للمسافر",
+      "subtitle": "دُعَاءُ المُقِيمِ لِلْمُسَافِرِ",
       "orderIndex": 102
     },
     {
       "id": 103,
       "title": "Glorifying and magnifying Allah on the journey",
-      "subtitle": "التكبير والتسبيح في سير السفر",
+      "subtitle": "التَّكْبِيرُ وَالتَّسْبِيحُ فِي سَيْرِ السَّفَرِ",
       "orderIndex": 103
     },
     {
       "id": 104,
       "title": "The traveler's invocation at dawn",
-      "subtitle": "دعاء المسافر إذا أسحر",
+      "subtitle": "دُعَاءُ المُسَافِرِ إِذَا أَسْحَرَ",
       "orderIndex": 104
     },
     {
       "id": 105,
       "title": "Invocation for a layover (stopping along the way) on the journey",
-      "subtitle": "الدعاء إذا نزل منزلاً في سفر أو غيره",
+      "subtitle": "الدُّعَاءُ إِذَا نَزَلَ مَنْزِلًا فِي سَفَرٍ أَوْ غَيْرِهِ",
       "orderIndex": 105
     },
     {
       "id": 106,
       "title": "What to say upon returning from a Journey",
-      "subtitle": "ذكر الرجوع من السفر",
+      "subtitle": "ذِكْرُ الرُّجُوعِ مِنَ السَّفَرِ",
       "orderIndex": 106
     },
     {
       "id": 107,
       "title": "What to say if something happens to please you or to displease you",
-      "subtitle": "ما يقول من أتاه أمر يسره أو يكرهه",
+      "subtitle": "مَا يَقُولُ مَنْ أَتَاهُ أَمْرٌ يَسُرُّهُ أَوْ يَكْرَهُهُ",
       "orderIndex": 107
     },
     {
       "id": 108,
       "title": "The excellence of asking for Allah's blessings upon the Prophet pbuh",
-      "subtitle": "فضل الصلاة على النبي صلى الله عليه وسلم",
+      "subtitle": "فَضْلُ الصَّلَاةِ عَلَى النَّبِيِّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ",
       "orderIndex": 108
     },
     {
       "id": 109,
       "title": "spreading the greetings of Salam (Peace)",
-      "subtitle": "إفشاء السلام",
+      "subtitle": "إِفْشَاءُ السَّلَامِ",
       "orderIndex": 109
     },
     {
       "id": 110,
       "title": "How to reply to a disbeliever if he says Salam to you",
-      "subtitle": "كيف يرد السلام على الكافر إذا سلم",
+      "subtitle": "كَيْفَ يَرُدُّ السَّلَامَ عَلَى الكَافِرِ إِذَا سَلَّمَ",
       "orderIndex": 110
     },
     {
       "id": 111,
       "title": "Invocation upon hearing the cock's crow or the bray of a donkey",
-      "subtitle": "الدعاء عند سماع صياح الديك ونهيق الحمار",
+      "subtitle": "الدُّعَاءُ عِنْدَ سَمَاعِ صِيَاحِ الدِّيكِ وَنَهِيقِ الحِمَارِ",
       "orderIndex": 111
     },
     {
       "id": 112,
       "title": "Invocation upon hearing a dog barking in the night",
-      "subtitle": "دعاء نباح الكلاب بالليل",
+      "subtitle": "دُعَاءُ نُبَاحِ الكِلَابِ بِاللَّيْلِ",
       "orderIndex": 112
     },
     {
       "id": 113,
       "title": "Invocation for someone you have spoken ill to",
-      "subtitle": "الدعاء لمن سببته",
+      "subtitle": "الدُّعَاءُ لِمَنْ سَبَبْتَهُ",
       "orderIndex": 113
     },
     {
       "id": 114,
       "title": "How a Muslim should praise another Muslim",
-      "subtitle": "ما يقول المسلم إذا مدح المسلم",
+      "subtitle": "مَا يَقُولُ المُسْلِمُ إِذَا مَدَحَ المُسْلِمَ",
       "orderIndex": 114
     },
     {
       "id": 115,
       "title": "What a Muslim should say when he is praised",
-      "subtitle": "ما يقول المسلم إذا زُكِّيَ",
+      "subtitle": "مَا يَقُولُ المُسْلِمُ إِذَا زُكِّيَ",
       "orderIndex": 115
     },
     {
       "id": 116,
       "title": "The pilgrim's announcement of his arrival for Hajj or Umrah",
-      "subtitle": "كيف يلبي المحرم في الحج أو العمرة؟",
+      "subtitle": "كَيْفَ يُلَبِّي المُحْرِمُ فِي الحَجِّ أَوِ العُمْرَةِ؟",
       "orderIndex": 116
     },
     {
       "id": 117,
       "title": "Saying Allahu Akbar when passing the Black Stone",
-      "subtitle": "التكبير إذا أتى الركن الأسود",
+      "subtitle": "التَّكْبِيرُ إِذَا أَتَى الرُّكْنَ الأَسْوَدَ",
       "orderIndex": 117
     },
     {
       "id": 118,
       "title": "Invocation to be recited between the Yemenite Corner and the Black Stone",
-      "subtitle": "الدعاء بين الركن اليماني والحجر الأسود",
+      "subtitle": "الدُّعَاءُ بَيْنَ الرُّكْنِ اليَمَانِيِّ وَالحَجَرِ الأَسْوَدِ",
       "orderIndex": 118
     },
     {
       "id": 119,
       "title": "Invocation to be recited while standing at Safa and Marwah",
-      "subtitle": "دعاء الوقوف على الصفا والمروة",
+      "subtitle": "دُعَاءُ الوُقُوفِ عَلَى الصَّفَا وَالمَرْوَةِ",
       "orderIndex": 119
     },
     {
       "id": 120,
       "title": "Invocation to be recited on the Day of Arafat",
-      "subtitle": "الدعاء يوم عرفة",
+      "subtitle": "الدُّعَاءُ يَوْمَ عَرَفَةَ",
       "orderIndex": 120
     },
     {
       "id": 121,
       "title": "Supplication to be recited at the sacred area of Muzdalifah",
-      "subtitle": "الذكر عند المشعر الحرام",
+      "subtitle": "الذِّكْرُ عِنْدَ المَشْعَرِ الحَرَامِ",
       "orderIndex": 121
     },
     {
       "id": 122,
       "title": "Saying Allahu Akbar while stoning the three pillars at Mina",
-      "subtitle": "التكبير عند رمي الجمار مع كل حصاة",
+      "subtitle": "التَّكْبِيرُ عِنْدَ رَمْيِ الجِمَارِ مَعَ كُلِّ حَصَاةٍ",
       "orderIndex": 122
     },
     {
       "id": 123,
       "title": "What to say when surprised or startled",
-      "subtitle": "دعاء التعجب والأمر السار",
+      "subtitle": "دُعَاءُ التَّعَجُّبِ وَالأَمْرِ السَّارِّ",
       "orderIndex": 123
     },
     {
       "id": 124,
       "title": "What to say when something that pleases you happens",
-      "subtitle": "ما يفعل من أتاه أمر يسره",
+      "subtitle": "مَا يَفْعَلُ مَنْ أَتَاهُ أَمْرٌ يَسُرُّهُ",
       "orderIndex": 124
     },
     {
       "id": 125,
       "title": "What to say when you feel a pain in your body",
-      "subtitle": "ما يقول من أحس وجعاً في جسده",
+      "subtitle": "مَا يَقُولُ مَنْ أَحَسَّ وَجَعًا فِي جَسَدِهِ",
       "orderIndex": 125
     },
     {
       "id": 126,
       "title": "What to say when you fear you may afflict something with the evil eye",
-      "subtitle": "دعاء من خشي أن يصيب شيئاً بعينه",
+      "subtitle": "دُعَاءُ مَنْ خَشِيَ أَنْ يُصِيبَ شَيْئًا بِعَيْنِهِ",
       "orderIndex": 126
     },
     {
       "id": 127,
       "title": "What to say when you feel frightened",
-      "subtitle": "ما يقال عند الفزع",
+      "subtitle": "مَا يُقَالُ عِنْدَ الفَزَعِ",
       "orderIndex": 127
     },
     {
       "id": 128,
       "title": "What to say when slaughtering or sacrificing an animal",
-      "subtitle": "ما يقول عند الذبح أو النحر",
+      "subtitle": "مَا يَقُولُ عِنْدَ الذَّبْحِ أَوِ النَّحْرِ",
       "orderIndex": 128
     },
     {
       "id": 129,
       "title": "What to say to foil the devil's plots",
-      "subtitle": "ما يقول لرد كيد مردة الشياطين",
+      "subtitle": "مَا يَقُولُ لِرَدِّ كَيْدِ مَرَدَةِ الشَّيَاطِينِ",
       "orderIndex": 129
     },
     {
       "id": 130,
       "title": "Repentance and seeking forgiveness",
-      "subtitle": "الاستغفار والتوبة",
+      "subtitle": "الِاسْتِغْفَارُ وَالتَّوْبَةُ",
       "orderIndex": 130
     },
     {
       "id": 131,
       "title": "The excellence of remembering Allah",
-      "subtitle": "فضل التسبيح والتحميد، والتهليل، والتكبير",
+      "subtitle": "فَضْلُ التَّسْبِيحِ وَالتَّحْمِيدِ، وَالتَّهْلِيلِ، وَالتَّكْبِيرِ",
       "orderIndex": 131
     },
     {
       "id": 132,
       "title": "How the Prophet glorified Allah",
-      "subtitle": "كيف كان النبي ﷺ يُسَبِّح؟",
+      "subtitle": "كَيْفَ كَانَ النَّبِيُّ ﷺ يُسَبِّحُ؟",
       "orderIndex": 132
     },
     {
       "id": 133,
       "title": "Types of goodness and good etiquette for community life",
-      "subtitle": "من أنواع الخير والآداب الجامعة",
+      "subtitle": "مِنْ أَنْوَاعِ الخَيْرِ وَالآدَابِ الجَامِعَةِ",
       "orderIndex": 133
     }
   ],

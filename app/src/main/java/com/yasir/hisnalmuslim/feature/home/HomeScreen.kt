@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -45,8 +46,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -333,6 +336,15 @@ private fun HomeCollectionTile(
     onClick: () -> Unit,
 ) {
     val arabicFont = LocalAppFonts.current.arabic
+    val isArabicTitle = settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC
+    val titleStyle = if (isArabicTitle) {
+        MaterialTheme.typography.bodyLarge.copy(
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize * 1.08f,
+            lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.08f,
+        )
+    } else {
+        MaterialTheme.typography.bodyLarge
+    }
     Surface(
         color = homeTileColor(),
         shape = shape,
@@ -352,16 +364,24 @@ private fun HomeCollectionTile(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
-                Text(
-                    text = collection.displayTitle(settings),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = if (settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC) {
-                        arabicFont
-                    } else {
-                        null
-                    },
-                )
+                if (isArabicTitle) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                        Text(
+                            text = collection.displayTitle(settings),
+                            modifier = Modifier.fillMaxWidth(),
+                            style = titleStyle,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = arabicFont,
+                            textAlign = TextAlign.Start,
+                        )
+                    }
+                } else {
+                    Text(
+                        text = collection.displayTitle(settings),
+                        style = titleStyle,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
             }
         }
     }

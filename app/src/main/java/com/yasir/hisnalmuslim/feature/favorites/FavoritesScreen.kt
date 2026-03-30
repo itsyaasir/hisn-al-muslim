@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +48,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -265,6 +268,15 @@ private fun FavoriteDhikrTile(
     onClick: () -> Unit,
 ) {
     val arabicFont = LocalAppFonts.current.arabic
+    val isArabicTitle = settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC
+    val titleStyle = if (isArabicTitle) {
+        MaterialTheme.typography.bodyLarge.copy(
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize * 1.08f,
+            lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.08f,
+        )
+    } else {
+        MaterialTheme.typography.bodyLarge
+    }
     Surface(
         color = groupedTileContainerColor(),
         shape = shape,
@@ -277,16 +289,24 @@ private fun FavoriteDhikrTile(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            Text(
-                text = dhikr.displayCollectionTitle(settings),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                fontFamily = if (settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC) {
-                    arabicFont
-                } else {
-                    null
-                },
-            )
+            if (isArabicTitle) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Text(
+                        text = dhikr.displayCollectionTitle(settings),
+                        modifier = Modifier.fillMaxWidth(),
+                        style = titleStyle,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                        fontFamily = arabicFont,
+                        textAlign = TextAlign.Start,
+                    )
+                }
+            } else {
+                Text(
+                    text = dhikr.displayCollectionTitle(settings),
+                    style = titleStyle,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                )
+            }
             val subtitle = when {
                 dhikr.title.isNotBlank() && dhikr.title != dhikr.collectionTitle -> dhikr.title
                 !dhikr.collectionSubtitle.isNullOrBlank() -> dhikr.collectionSubtitle
