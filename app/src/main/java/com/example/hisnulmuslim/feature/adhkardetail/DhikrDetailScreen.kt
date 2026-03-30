@@ -454,7 +454,7 @@ private fun DetailScrollableHeader(
         IconButton(onClick = onToggleFavorite) {
             Icon(
                 imageVector = if (isFavorite) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder,
-                contentDescription = if (isFavorite) "Saved collection" else "Save collection",
+                contentDescription = if (isFavorite) "Saved dhikr" else "Save dhikr",
             )
         }
         Box {

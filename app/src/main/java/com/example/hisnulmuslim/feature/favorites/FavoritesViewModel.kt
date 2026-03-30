@@ -2,7 +2,7 @@ package com.example.hisnulmuslim.feature.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hisnulmuslim.core.model.Collection
+import com.example.hisnulmuslim.core.model.Dhikr
 import com.example.hisnulmuslim.data.repository.DhikrRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -15,22 +15,22 @@ import kotlinx.coroutines.launch
 class FavoritesViewModel @Inject constructor(
     private val repository: DhikrRepository,
 ) : ViewModel() {
-    val uiState: StateFlow<List<Collection>> = repository.observeFavoriteCollections()
+    val uiState: StateFlow<List<Dhikr>> = repository.observeFavorites()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList(),
         )
 
-    fun removeFavorite(collectionId: Long) {
+    fun removeFavorite(dhikrId: Long) {
         viewModelScope.launch {
-            repository.removeCollectionFavorite(collectionId)
+            repository.removeFavorite(dhikrId)
         }
     }
 
-    fun restoreFavorite(collectionId: Long) {
+    fun restoreFavorite(dhikrId: Long) {
         viewModelScope.launch {
-            repository.addCollectionFavorite(collectionId)
+            repository.addFavorite(dhikrId)
         }
     }
 }

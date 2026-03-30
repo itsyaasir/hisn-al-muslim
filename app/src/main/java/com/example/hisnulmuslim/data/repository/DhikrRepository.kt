@@ -36,8 +36,8 @@ class DhikrRepository @Inject constructor(
         return dhikrDao.observeAllOrdered().map { items -> items.map { it.toModel() } }
     }
 
-    fun observeFavoriteCollections(): Flow<List<Collection>> {
-        return dhikrDao.observeFavoriteCollections().map { items -> items.map { it.toModel() } }
+    fun observeFavorites(): Flow<List<Dhikr>> {
+        return dhikrDao.observeFavorites().map { items -> items.map { it.toModel() } }
     }
 
     fun observeDailyHighlight(): Flow<Dhikr?> {
@@ -60,40 +60,34 @@ class DhikrRepository @Inject constructor(
         return dhikrDao.search(normalizedQuery).map { items -> items.map { it.toModel() } }
     }
 
-    fun observeIsCollectionFavorite(collectionId: Long): Flow<Boolean> {
-        return favoriteDao.observeIsCollectionFavorite(collectionId)
+    fun observeIsFavorite(dhikrId: Long): Flow<Boolean> {
+        return favoriteDao.observeIsFavorite(dhikrId)
     }
 
     fun observeProgress(dhikrId: Long): Flow<DhikrProgress?> {
         return progressDao.observeByDhikrId(dhikrId).map { it?.toModel() }
     }
 
-    suspend fun toggleCollectionFavorite(collectionId: Long) {
-        val isFavorite = favoriteDao.isCollectionFavorite(collectionId)
+    suspend fun toggleFavorite(dhikrId: Long) {
+        val isFavorite = favoriteDao.isFavorite(dhikrId)
         if (isFavorite) {
-            removeCollectionFavorite(collectionId)
+            removeFavorite(dhikrId)
         } else {
-            addCollectionFavorite(collectionId)
+            addFavorite(dhikrId)
         }
     }
 
-    suspend fun addCollectionFavorite(collectionId: Long) {
-        val dhikrIds = dhikrDao.getDhikrIdsForCollection(collectionId)
-        if (dhikrIds.isEmpty()) return
-
-        val createdAt = timeProvider.now()
-        favoriteDao.upsertAll(
-            dhikrIds.map { dhikrId ->
-                FavoriteEntity(
-                    dhikrId = dhikrId,
-                    createdAt = createdAt,
-                )
-            },
+    suspend fun addFavorite(dhikrId: Long) {
+        favoriteDao.upsert(
+            FavoriteEntity(
+                dhikrId = dhikrId,
+                createdAt = timeProvider.now(),
+            ),
         )
     }
 
-    suspend fun removeCollectionFavorite(collectionId: Long) {
-        favoriteDao.deleteByCollectionId(collectionId)
+    suspend fun removeFavorite(dhikrId: Long) {
+        favoriteDao.deleteByDhikrId(dhikrId)
     }
 
     suspend fun updateProgress(dhikrId: Long, currentCount: Int, completedCount: Int) {

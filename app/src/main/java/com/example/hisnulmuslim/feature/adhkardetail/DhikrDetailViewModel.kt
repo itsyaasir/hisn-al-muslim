@@ -63,8 +63,8 @@ class DhikrDetailViewModel @Inject constructor(
             }
         },
         dhikrId,
-        collectionId.flatMapLatest { currentCollectionId ->
-            if (currentCollectionId == null) flowOf(false) else repository.observeIsCollectionFavorite(currentCollectionId)
+        dhikrId.flatMapLatest { currentDhikrId ->
+            if (currentDhikrId == null) flowOf(false) else repository.observeIsFavorite(currentDhikrId)
         },
         dhikrId.flatMapLatest { currentDhikrId ->
             if (currentDhikrId == null) flowOf(null) else repository.observeProgress(currentDhikrId)
@@ -99,9 +99,9 @@ class DhikrDetailViewModel @Inject constructor(
     }
 
     fun toggleFavorite() {
-        val collectionId = collectionId.value ?: return
+        val dhikrId = dhikrId.value ?: return
         viewModelScope.launch {
-            repository.toggleCollectionFavorite(collectionId)
+            repository.toggleFavorite(dhikrId)
         }
     }
 

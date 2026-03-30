@@ -7,7 +7,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -34,6 +37,7 @@ fun HisnulMuslimNavHost(
     @Suppress("UNCHECKED_CAST")
     val backStack = rememberNavBackStack(AppDestination.Home) as NavBackStack<AppDestination>
     val currentDestination = backStack.lastOrNull()
+    val snackbarHostState = remember { SnackbarHostState() }
     val entryDecorators = listOf<NavEntryDecorator<AppDestination>>(
         rememberSaveableStateHolderNavEntryDecorator<AppDestination>(),
         rememberViewModelStoreNavEntryDecorator<AppDestination>(viewModelStoreOwner),
@@ -41,6 +45,9 @@ fun HisnulMuslimNavHost(
 
     Scaffold(
         modifier = modifier,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         bottomBar = {
             TopLevelFloatingNavigationBar(
                 currentDestination = currentDestination,
@@ -115,11 +122,12 @@ fun HisnulMuslimNavHost(
                     entry<AppDestination.Favorites> { _ ->
                         FavoritesScreen(
                             contentPadding = innerPadding,
-                            onOpenCollection = { collection ->
+                            snackbarHostState = snackbarHostState,
+                            onOpenDhikr = { dhikr ->
                                 backStack.add(
                                     AppDestination.DhikrDetail(
-                                        dhikrId = collection.firstDhikrId,
-                                        collectionId = collection.id,
+                                        dhikrId = dhikr.id,
+                                        collectionId = dhikr.collectionId,
                                     ),
                                 )
                             },

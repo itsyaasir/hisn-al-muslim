@@ -25,7 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
@@ -38,7 +38,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,13 +57,14 @@ import com.example.hisnulmuslim.core.designsystem.LocalMotionPreferences
 import com.example.hisnulmuslim.core.designsystem.appTopBarContainerColor
 import com.example.hisnulmuslim.core.designsystem.groupedTileContainerColor
 import com.example.hisnulmuslim.core.designsystem.mergePaddingValues
-import com.example.hisnulmuslim.core.model.Collection
+import com.example.hisnulmuslim.core.model.Dhikr
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FavoritesScreen(
     contentPadding: PaddingValues,
-    onOpenCollection: (Collection) -> Unit,
+    snackbarHostState: SnackbarHostState,
+    onOpenDhikr: (Dhikr) -> Unit,
     viewModel: FavoritesViewModel = hiltViewModel(),
 ) {
     val favorites by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,7 +72,23 @@ fun FavoritesScreen(
     val layoutDirection = LocalLayoutDirection.current
     val topBarContainer = appTopBarContainerColor()
     val topBarTitleFont = LocalAppFonts.current.topBarTitle
-    val snackbarHostState = remember { SnackbarHostState() }
+    var pendingRemovedFavorite by remember { mutableStateOf<Dhikr?>(null) }
+
+    LaunchedEffect(pendingRemovedFavorite?.id) {
+        val removedFavorite = pendingRemovedFavorite ?: return@LaunchedEffect
+        snackbarHostState.currentSnackbarData?.dismiss()
+        val result = snackbarHostState.showSnackbar(
+            message = "Removed from favorites",
+            actionLabel = "Undo",
+            withDismissAction = false,
+            duration = SnackbarDuration.Long,
+        )
+        if (result == SnackbarResult.ActionPerformed) {
+            viewModel.restoreFavorite(removedFavorite.id)
+        }
+        pendingRemovedFavorite = null
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -79,9 +98,6 @@ fun FavoritesScreen(
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             containerColor = topBarContainer,
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState)
-            },
             topBar = {
                 TopAppBar(
                     title = {
@@ -127,7 +143,7 @@ fun FavoritesScreen(
                     item {
                         EmptyStateCard(
                             title = "No favorites yet",
-                            subtitle = "Save meaningful collections here for quick return later.",
+                            subtitle = "Save meaningful dhikr here for quick return later.",
                         )
                     }
                 } else {
@@ -136,19 +152,11 @@ fun FavoritesScreen(
                         key = { _, item -> item.id },
                     ) { index, item ->
                         val shape = favoriteGroupShape(index, favorites.size)
-                        val dismissState = rememberFavoriteDismissState()
+                        val dismissState = rememberFavoriteDismissState(dhikrId = item.id)
                         LaunchedEffect(dismissState.currentValue, item.id) {
                             if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
                                 viewModel.removeFavorite(item.id)
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                                val result = snackbarHostState.showSnackbar(
-                                    message = "${item.title} removed from favorites",
-                                    actionLabel = "Undo",
-                                    withDismissAction = true,
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    viewModel.restoreFavorite(item.id)
-                                }
+                                pendingRemovedFavorite = item
                             }
                         }
                         SwipeToDismissBox(
@@ -163,10 +171,10 @@ fun FavoritesScreen(
                             },
                             modifier = Modifier,
                         ) {
-                            FavoriteCollectionTile(
-                                collection = item,
+                            FavoriteDhikrTile(
+                                dhikr = item,
                                 shape = shape,
-                                onClick = { onOpenCollection(item) },
+                                onClick = { onOpenDhikr(item) },
                             )
                         }
                     }
@@ -179,10 +187,14 @@ fun FavoritesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun rememberFavoriteDismissState(
+    dhikrId: Long,
 ): SwipeToDismissBoxState {
-    return androidx.compose.material3.rememberSwipeToDismissBoxState(
-        positionalThreshold = { it * 0.32f },
-    )
+    return remember(dhikrId) {
+        SwipeToDismissBoxState(
+            initialValue = SwipeToDismissBoxValue.Settled,
+            positionalThreshold = { it * 0.32f },
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -243,8 +255,8 @@ private fun FavoriteDismissBackground(
 }
 
 @Composable
-private fun FavoriteCollectionTile(
-    collection: Collection,
+private fun FavoriteDhikrTile(
+    dhikr: Dhikr,
     shape: RoundedCornerShape,
     onClick: () -> Unit,
 ) {
@@ -261,13 +273,18 @@ private fun FavoriteCollectionTile(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                text = collection.title,
+                text = dhikr.collectionTitle,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
             )
-            collection.subtitle?.takeIf { it.isNotBlank() }?.let { subtitle ->
+            val subtitle = when {
+                dhikr.title.isNotBlank() && dhikr.title != dhikr.collectionTitle -> dhikr.title
+                !dhikr.collectionSubtitle.isNullOrBlank() -> dhikr.collectionSubtitle
+                else -> null
+            }
+            subtitle?.let {
                 Text(
-                    text = subtitle,
+                    text = it,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,

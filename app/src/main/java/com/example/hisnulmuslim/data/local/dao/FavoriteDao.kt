@@ -9,35 +9,17 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteDao {
-    @Query(
-        """
-        SELECT EXISTS(
-            SELECT 1
-            FROM favorites
-            INNER JOIN adhkar ON adhkar.id = favorites.dhikrId
-            WHERE adhkar.collectionId = :collectionId
-        )
-        """,
-    )
-    fun observeIsCollectionFavorite(collectionId: Long): Flow<Boolean>
+    @Query("SELECT EXISTS(SELECT 1 FROM favorites WHERE dhikrId = :dhikrId)")
+    fun observeIsFavorite(dhikrId: Long): Flow<Boolean>
 
-    @Query(
-        """
-        SELECT EXISTS(
-            SELECT 1
-            FROM favorites
-            INNER JOIN adhkar ON adhkar.id = favorites.dhikrId
-            WHERE adhkar.collectionId = :collectionId
-        )
-        """,
-    )
-    suspend fun isCollectionFavorite(collectionId: Long): Boolean
+    @Query("SELECT EXISTS(SELECT 1 FROM favorites WHERE dhikrId = :dhikrId)")
+    suspend fun isFavorite(dhikrId: Long): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertAll(entities: List<FavoriteEntity>)
+    suspend fun upsert(entity: FavoriteEntity)
 
-    @Query("DELETE FROM favorites WHERE dhikrId IN (SELECT id FROM adhkar WHERE collectionId = :collectionId)")
-    suspend fun deleteByCollectionId(collectionId: Long)
+    @Query("DELETE FROM favorites WHERE dhikrId = :dhikrId")
+    suspend fun deleteByDhikrId(dhikrId: Long)
 
     @Query("DELETE FROM favorites")
     suspend fun deleteAll()
