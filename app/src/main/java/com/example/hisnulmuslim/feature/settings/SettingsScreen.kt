@@ -172,6 +172,7 @@ fun SettingsScreen(
             contentPadding = contentPadding,
             settings = settings,
             onBack = { currentPage = SettingsPage.Main },
+            onFontScaleChange = viewModel::setFontScale,
             onThemeModeChange = viewModel::setThemeMode,
             onDynamicColorChange = viewModel::setDynamicColor,
             onPureBlackThemeChange = viewModel::setPureBlackTheme,
@@ -182,7 +183,6 @@ fun SettingsScreen(
             contentPadding = contentPadding,
             settings = settings,
             onBack = { currentPage = SettingsPage.Main },
-            onFontScaleChange = viewModel::setFontScale,
             onArabicFontFamilyChange = viewModel::setArabicFontFamily,
             onArabicFontScaleChange = viewModel::setArabicFontScale,
             onTransliterationFontScaleChange = viewModel::setTransliterationFontScale,
@@ -319,6 +319,7 @@ private fun SettingsAppearancePage(
     contentPadding: PaddingValues,
     settings: AppSettings,
     onBack: () -> Unit,
+    onFontScaleChange: (Float) -> Unit,
     onThemeModeChange: (ThemeMode) -> Unit,
     onDynamicColorChange: (Boolean) -> Unit,
     onPureBlackThemeChange: (Boolean) -> Unit,
@@ -369,6 +370,23 @@ private fun SettingsAppearancePage(
 
         item {
             SettingsGroup {
+                SettingsSliderTile(
+                    shape = settingsGroupShape(0, 1),
+                    icon = { SettingsIcon(Icons.Outlined.TextFields) },
+                    title = "Interface size",
+                    subtitle = "Adjust app text and UI size.",
+                    value = settings.fontScale,
+                    valueRange = 0.85f..1.35f,
+                    valueLabel = percentageLabel(settings.fontScale),
+                    onValueChange = onFontScaleChange,
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        item {
+            SettingsGroup {
                 SettingsThemeColorTile(
                     shape = settingsGroupShape(0, 1),
                     selectedColor = settings.themeSeedColor,
@@ -387,7 +405,6 @@ private fun SettingsReadingPage(
     contentPadding: PaddingValues,
     settings: AppSettings,
     onBack: () -> Unit,
-    onFontScaleChange: (Float) -> Unit,
     onArabicFontFamilyChange: (ArabicFontFamily) -> Unit,
     onArabicFontScaleChange: (Float) -> Unit,
     onTransliterationFontScaleChange: (Float) -> Unit,
@@ -415,12 +432,18 @@ private fun SettingsReadingPage(
         item { Spacer(Modifier.height(14.dp)) }
 
         item {
+            SettingsSectionLabel("Content")
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
             SettingsGroup {
                 SettingsSwitchTile(
                     shape = settingsGroupShape(0, 3),
                     icon = { SettingsIcon(Icons.Outlined.Translate) },
                     title = "Show transliteration",
-                    subtitle = "Keep pronunciation guidance visible beneath the Arabic text.",
+                    subtitle = "Show pronunciation guidance.",
                     checked = settings.showTransliteration,
                     onCheckedChange = onShowTransliterationChange,
                 )
@@ -428,7 +451,7 @@ private fun SettingsReadingPage(
                     shape = settingsGroupShape(1, 3),
                     icon = { SettingsIcon(Icons.Outlined.Translate) },
                     title = "Show translation",
-                    subtitle = "Keep the meaning visible while reading.",
+                    subtitle = "Show translated meaning.",
                     checked = settings.showTranslation,
                     onCheckedChange = onShowTranslationChange,
                 )
@@ -436,7 +459,7 @@ private fun SettingsReadingPage(
                     shape = settingsGroupShape(2, 3),
                     icon = { SettingsIcon(Icons.Outlined.Visibility) },
                     title = "Show reference",
-                    subtitle = "Show source references and notes on the detail page.",
+                    subtitle = "Show source and notes.",
                     checked = settings.showReference,
                     onCheckedChange = onShowReferenceChange,
                 )
@@ -446,49 +469,58 @@ private fun SettingsReadingPage(
         item { Spacer(Modifier.height(12.dp)) }
 
         item {
+            SettingsSectionLabel("Arabic")
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
             SettingsGroup {
                 SettingsNavigationTile(
-                    shape = settingsGroupShape(0, 5),
+                    shape = settingsGroupShape(0, 2),
                     icon = { SettingsIcon(Icons.AutoMirrored.Outlined.MenuBook) },
                     title = "Arabic font",
                     subtitle = settings.arabicFontFamily.label(),
                     onClick = { showArabicFontSheet = true },
                 )
                 SettingsSliderTile(
-                    shape = settingsGroupShape(1, 5),
-                    icon = { SettingsIcon(Icons.Outlined.TextFields) },
-                    title = "Interface size",
-                    subtitle = "Adjust overall UI and supporting text sizing.",
-                    value = settings.fontScale,
-                    valueRange = 0.85f..1.35f,
-                    valueLabel = percentageLabel(settings.fontScale),
-                    onValueChange = onFontScaleChange,
-                )
-                SettingsSliderTile(
-                    shape = settingsGroupShape(2, 5),
+                    shape = settingsGroupShape(1, 2),
                     icon = { SettingsIcon(Icons.Outlined.TextFields) },
                     title = "Arabic text size",
-                    subtitle = "Give the Arabic script more presence and breathing room.",
+                    subtitle = "Adjust Arabic reading size.",
                     value = settings.arabicFontScale,
                     valueRange = 1.0f..1.6f,
                     valueLabel = multiplierLabel(settings.arabicFontScale),
                     onValueChange = onArabicFontScaleChange,
                 )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        item {
+            SettingsSectionLabel("Supporting text")
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
+            SettingsGroup {
                 SettingsSliderTile(
-                    shape = settingsGroupShape(3, 5),
+                    shape = settingsGroupShape(0, 2),
                     icon = { SettingsIcon(Icons.Outlined.Translate) },
                     title = "Transliteration size",
-                    subtitle = "Control the readability of transliteration lines.",
+                    subtitle = "Adjust transliteration size.",
                     value = settings.transliterationFontScale,
                     valueRange = 0.9f..1.4f,
                     valueLabel = multiplierLabel(settings.transliterationFontScale),
                     onValueChange = onTransliterationFontScaleChange,
                 )
                 SettingsSliderTile(
-                    shape = settingsGroupShape(4, 5),
+                    shape = settingsGroupShape(1, 2),
                     icon = { SettingsIcon(Icons.Outlined.Translate) },
                     title = "Translation size",
-                    subtitle = "Adjust the size of the translated meaning.",
+                    subtitle = "Adjust translation size.",
                     value = settings.translationFontScale,
                     valueRange = 0.9f..1.4f,
                     valueLabel = multiplierLabel(settings.translationFontScale),
@@ -499,6 +531,16 @@ private fun SettingsReadingPage(
 
         item { Spacer(Modifier.height(24.dp)) }
     }
+}
+
+@Composable
+private fun SettingsSectionLabel(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 4.dp),
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
