@@ -2,7 +2,6 @@ package com.example.hisnulmuslim.feature.adhkardetail
 
 import android.content.ClipData
 import android.content.Intent
-import android.app.Activity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -59,6 +58,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -260,7 +260,11 @@ fun DhikrDetailScreen(
             ) { page ->
                 val pageDhikr = uiState.collectionDhikr[page]
                 val pageScrollState = pageScrollStates.getOrPut(page) { ScrollState(0) }
-                val rawOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
+                val rawOffset by remember(pagerState, page) {
+                    derivedStateOf {
+                        (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                    }
+                }
                 val pageOffset = rawOffset.absoluteValue.coerceIn(0f, 1f)
                 val pageScale = lerpFloat(start = 0.972f, stop = 1f, fraction = 1f - pageOffset)
                 val pageAlpha = lerpFloat(start = 0.94f, stop = 1f, fraction = 1f - pageOffset)

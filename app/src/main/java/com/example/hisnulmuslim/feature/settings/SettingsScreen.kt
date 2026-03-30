@@ -2,9 +2,9 @@ package com.example.hisnulmuslim.feature.settings
 
 import android.app.LocaleConfig
 import android.app.LocaleManager
-import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -72,6 +72,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
@@ -114,13 +115,14 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
     val settings by viewModel.uiState.collectAsStateWithLifecycle()
     var currentPage by rememberSaveable { mutableStateOf(SettingsPage.Main) }
     var showLocaleSheet by rememberSaveable { mutableStateOf(false) }
     val localeSelectorEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
-    val localeLabel = remember(context) {
-        val locale = context.resources.configuration.locales[0]
+    val localeLabel = remember(configuration) {
+        val locale = configuration.locales[0]
         locale.displayName.replaceFirstChar {
             if (it.isLowerCase()) it.titlecase(locale) else it.toString()
         }
@@ -729,6 +731,7 @@ private data class SettingsAppLocale(
     val name: String,
 )
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SettingsLocaleBottomSheet(

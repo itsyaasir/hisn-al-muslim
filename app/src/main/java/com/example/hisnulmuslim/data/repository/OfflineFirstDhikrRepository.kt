@@ -11,7 +11,7 @@ import com.example.hisnulmuslim.data.local.dao.ProgressDao
 import com.example.hisnulmuslim.data.local.entity.FavoriteEntity
 import com.example.hisnulmuslim.data.local.entity.ProgressEntity
 import com.example.hisnulmuslim.data.mapper.toModel
-import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -45,7 +45,8 @@ class OfflineFirstDhikrRepository @Inject constructor(
             if (items.isEmpty()) {
                 null
             } else {
-                val dayIndex = (LocalDate.now().toEpochDay() % items.size).toInt()
+                val epochDay = TimeUnit.MILLISECONDS.toDays(timeProvider.now())
+                val dayIndex = (epochDay % items.size).toInt()
                 items[dayIndex].toModel()
             }
         }

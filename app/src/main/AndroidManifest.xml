@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:name=".app.HisnulMuslimApplication"
@@ -11,7 +12,8 @@
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HisnulMuslim">
+        android:theme="@style/Theme.HisnulMuslim"
+        tools:targetApi="tiramisu">
         <activity
             android:name=".app.MainActivity"
             android:exported="true"

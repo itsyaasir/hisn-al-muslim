@@ -1,6 +1,5 @@
 package com.example.hisnulmuslim.navigation
 
-import android.app.Activity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn

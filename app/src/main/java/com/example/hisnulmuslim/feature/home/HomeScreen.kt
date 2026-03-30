@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -98,10 +99,12 @@ private fun HomeScreenContent(
     val layoutDirection = LocalLayoutDirection.current
     val topBarTitleFont = LocalAppFonts.current.topBarTitle
 
-    val collapseTarget = remember(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
-        when {
-            listState.firstVisibleItemIndex > 0 -> 1f
-            else -> (listState.firstVisibleItemScrollOffset / 160f).coerceIn(0f, 1f)
+    val collapseTarget by remember(listState) {
+        derivedStateOf {
+            when {
+                listState.firstVisibleItemIndex > 0 -> 1f
+                else -> (listState.firstVisibleItemScrollOffset / 160f).coerceIn(0f, 1f)
+            }
         }
     }
     val collapseProgress by animateFloatAsState(targetValue = collapseTarget, label = "dailyReflectionCollapse")

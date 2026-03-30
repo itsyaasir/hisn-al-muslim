@@ -1,6 +1,7 @@
 package com.example.hisnulmuslim.core.designsystem
 
 import android.animation.ValueAnimator
+import android.os.Build
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
@@ -40,6 +41,10 @@ val LocalMotionPreferences = staticCompositionLocalOf { MotionPreferences() }
 @Composable
 fun rememberMotionPreferences(): MotionPreferences {
     return MotionPreferences(
-        animationsEnabled = ValueAnimator.areAnimatorsEnabled(),
+        animationsEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ValueAnimator.areAnimatorsEnabled()
+        } else {
+            true
+        },
     )
 }
