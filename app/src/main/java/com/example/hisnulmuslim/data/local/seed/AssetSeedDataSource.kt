@@ -9,7 +9,7 @@ class AssetSeedDataSource @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val json: Json,
 ) {
-    suspend fun loadDataset(): SeedDataset {
+    fun loadDataset(): SeedDataset {
         return context.assets.open(SEED_FILE_NAME).bufferedReader().use { reader ->
             json.decodeFromString<SeedDataset>(reader.readText())
         }

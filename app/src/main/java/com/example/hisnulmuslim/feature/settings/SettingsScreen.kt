@@ -125,6 +125,18 @@ fun SettingsScreen(
     var showLocaleSheet by rememberSaveable { mutableStateOf(false) }
     val localeSelectorEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
+    fun navigateTo(page: SettingsPage) {
+        currentPage = page
+    }
+
+    fun showLanguageSheet() {
+        showLocaleSheet = true
+    }
+
+    fun hideLanguageSheet() {
+        showLocaleSheet = false
+    }
+
     val localeLabel = remember(configuration) {
         val locale = configuration.locales[0]
         locale.displayName.replaceFirstChar {
@@ -158,7 +170,7 @@ fun SettingsScreen(
 
     if (showLocaleSheet && localeSelectorEnabled) {
         SettingsLocaleBottomSheet(
-            onDismiss = { showLocaleSheet = false },
+            onDismiss = ::hideLanguageSheet,
         )
     }
 
@@ -167,17 +179,17 @@ fun SettingsScreen(
             contentPadding = contentPadding,
             localeLabel = localeLabel.takeIf { localeSelectorEnabled },
             versionLabel = versionLabel,
-            onOpenAppearance = { currentPage = SettingsPage.Appearance },
-            onOpenReading = { currentPage = SettingsPage.Reading },
-            onOpenLanguage = { showLocaleSheet = true },
-            onOpenAbout = { currentPage = SettingsPage.About },
+            onOpenAppearance = { navigateTo(SettingsPage.Appearance) },
+            onOpenReading = { navigateTo(SettingsPage.Reading) },
+            onOpenLanguage = ::showLanguageSheet,
+            onOpenAbout = { navigateTo(SettingsPage.About) },
             onResetFavorites = viewModel::clearFavorites,
         )
 
         SettingsPage.Appearance -> SettingsAppearancePage(
             contentPadding = contentPadding,
             settings = settings,
-            onBack = { currentPage = SettingsPage.Main },
+            onBack = { navigateTo(SettingsPage.Main) },
             onFontScaleChange = viewModel::setFontScale,
             onThemeModeChange = viewModel::setThemeMode,
             onDynamicColorChange = viewModel::setDynamicColor,
@@ -188,7 +200,7 @@ fun SettingsScreen(
         SettingsPage.Reading -> SettingsReadingPage(
             contentPadding = contentPadding,
             settings = settings,
-            onBack = { currentPage = SettingsPage.Main },
+            onBack = { navigateTo(SettingsPage.Main) },
             onArabicFontFamilyChange = viewModel::setArabicFontFamily,
             onArabicFontScaleChange = viewModel::setArabicFontScale,
             onTransliterationFontScaleChange = viewModel::setTransliterationFontScale,
@@ -202,7 +214,7 @@ fun SettingsScreen(
             contentPadding = contentPadding,
             versionLabel = versionLabel,
             versionCodeLabel = versionCodeLabel,
-            onBack = { currentPage = SettingsPage.Main },
+            onBack = { navigateTo(SettingsPage.Main) },
         )
     }
 }
@@ -222,6 +234,19 @@ private fun SettingsMainPage(
     var showResetFavoritesDialog by rememberSaveable { mutableStateOf(false) }
     val hasLanguageTile = localeLabel != null
     val appGroupCount = if (hasLanguageTile) 2 else 1
+
+    fun openResetFavoritesDialog() {
+        showResetFavoritesDialog = true
+    }
+
+    fun dismissResetFavoritesDialog() {
+        showResetFavoritesDialog = false
+    }
+
+    fun confirmResetFavorites() {
+        dismissResetFavoritesDialog()
+        onResetFavorites()
+    }
 
     SettingsPageScaffold(
         contentPadding = contentPadding,
@@ -284,7 +309,7 @@ private fun SettingsMainPage(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
-                TextButton(onClick = { showResetFavoritesDialog = true }) {
+                TextButton(onClick = ::openResetFavoritesDialog) {
                     Text("Reset Favorites")
                 }
             }
@@ -295,23 +320,18 @@ private fun SettingsMainPage(
 
     if (showResetFavoritesDialog) {
         AlertDialog(
-            onDismissRequest = { showResetFavoritesDialog = false },
+            onDismissRequest = ::dismissResetFavoritesDialog,
             title = { Text("Reset Favorites") },
             text = {
                 Text("Are you sure you want to clear all saved favorites?")
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        showResetFavoritesDialog = false
-                        onResetFavorites()
-                    },
-                ) {
+                TextButton(onClick = ::confirmResetFavorites) {
                     Text("Reset")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showResetFavoritesDialog = false }) {
+                TextButton(onClick = ::dismissResetFavoritesDialog) {
                     Text("Cancel")
                 }
             },
@@ -421,11 +441,19 @@ private fun SettingsReadingPage(
 ) {
     var showArabicFontSheet by rememberSaveable { mutableStateOf(false) }
 
+    fun openArabicFontSheet() {
+        showArabicFontSheet = true
+    }
+
+    fun dismissArabicFontSheet() {
+        showArabicFontSheet = false
+    }
+
     if (showArabicFontSheet) {
         SettingsArabicFontBottomSheet(
             selectedFont = settings.arabicFontFamily,
             onFontSelected = onArabicFontFamilyChange,
-            onDismiss = { showArabicFontSheet = false },
+            onDismiss = ::dismissArabicFontSheet,
         )
     }
 
@@ -450,7 +478,7 @@ private fun SettingsReadingPage(
                     icon = { SettingsIcon(Icons.AutoMirrored.Outlined.MenuBook) },
                     title = "Arabic font",
                     subtitle = settings.arabicFontFamily.label(),
-                    onClick = { showArabicFontSheet = true },
+                    onClick = ::openArabicFontSheet,
                 )
                 SettingsSliderTile(
                     shape = settingsGroupShape(1, 2),
@@ -640,6 +668,14 @@ private fun SettingsAboutPage(
 ) {
     val uriHandler = LocalUriHandler.current
     var showLicenseDialog by rememberSaveable { mutableStateOf(false) }
+    fun openLicenseDialog() {
+        showLicenseDialog = true
+    }
+
+    fun dismissLicenseDialog() {
+        showLicenseDialog = false
+    }
+
     val socialLinks = remember {
         listOf(
             AboutQuickLink(R.drawable.github, "GitHub", "https://example.com/github"),
@@ -719,7 +755,7 @@ private fun SettingsAboutPage(
                     },
                     title = "License",
                     subtitle = "GNU General Public License Version 3",
-                    onClick = { showLicenseDialog = true },
+                    onClick = ::openLicenseDialog,
                 )
             }
         }
@@ -729,7 +765,7 @@ private fun SettingsAboutPage(
 
     if (showLicenseDialog) {
         AlertDialog(
-            onDismissRequest = { showLicenseDialog = false },
+            onDismissRequest = ::dismissLicenseDialog,
             title = { Text("License") },
             text = {
                 Text(
@@ -737,7 +773,7 @@ private fun SettingsAboutPage(
                 )
             },
             confirmButton = {
-                TextButton(onClick = { showLicenseDialog = false }) {
+                TextButton(onClick = ::dismissLicenseDialog) {
                     Text("Close")
                 }
             },

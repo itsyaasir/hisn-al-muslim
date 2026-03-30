@@ -16,7 +16,6 @@ data class AppSettings(
     val showTransliteration: Boolean = true,
     val showTranslation: Boolean = true,
     val showReference: Boolean = true,
-    val onboardingCompleted: Boolean = false,
 )
 
 enum class ArabicFontFamily {
