@@ -94,6 +94,7 @@ import com.yasir.hisnalmuslim.core.designsystem.groupedTileContainerColor
 import com.yasir.hisnalmuslim.core.designsystem.LocalAppFonts
 import com.yasir.hisnalmuslim.core.model.ArabicFontFamily
 import com.yasir.hisnalmuslim.core.model.AppSettings
+import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.DefaultThemeSeedColor
 import com.yasir.hisnalmuslim.core.model.ThemeMode
 import com.yasir.hisnalmuslim.core.designsystem.mergePaddingValues
@@ -201,6 +202,7 @@ fun SettingsScreen(
             contentPadding = contentPadding,
             settings = settings,
             onBack = { navigateTo(SettingsPage.Main) },
+            onCollectionTitleLanguageChange = viewModel::setCollectionTitleLanguage,
             onArabicFontFamilyChange = viewModel::setArabicFontFamily,
             onArabicFontScaleChange = viewModel::setArabicFontScale,
             onTransliterationFontScaleChange = viewModel::setTransliterationFontScale,
@@ -431,6 +433,7 @@ private fun SettingsReadingPage(
     contentPadding: PaddingValues,
     settings: AppSettings,
     onBack: () -> Unit,
+    onCollectionTitleLanguageChange: (CollectionTitleLanguage) -> Unit,
     onArabicFontFamilyChange: (ArabicFontFamily) -> Unit,
     onArabicFontScaleChange: (Float) -> Unit,
     onTransliterationFontScaleChange: (Float) -> Unit,
@@ -464,6 +467,24 @@ private fun SettingsReadingPage(
         onBack = onBack,
     ) {
         item { Spacer(Modifier.height(14.dp)) }
+
+        item {
+            SettingsSectionLabel("Collections")
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
+            SettingsGroup {
+                SettingsCollectionTitleLanguageTile(
+                    shape = settingsGroupShape(0, 1),
+                    selectedLanguage = settings.collectionTitleLanguage,
+                    onLanguageSelected = onCollectionTitleLanguageChange,
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
 
         item {
             SettingsSectionLabel("Arabic")
@@ -1240,6 +1261,48 @@ private fun SettingsAppearanceModeTile(
     }
 }
 
+@Composable
+private fun SettingsCollectionTitleLanguageTile(
+    shape: RoundedCornerShape,
+    selectedLanguage: CollectionTitleLanguage,
+    onLanguageSelected: (CollectionTitleLanguage) -> Unit,
+) {
+    SettingsStaticTile(shape = shape) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SettingsIcon(Icons.AutoMirrored.Outlined.MenuBook)
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "Collection titles",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    Text(
+                        text = "Choose whether collection names appear in English or Arabic.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            ConnectedChoiceRow(
+                options = CollectionTitleLanguage.entries,
+                selected = selectedLanguage,
+                labelFor = { it.label() },
+                onSelected = onLanguageSelected,
+            )
+        }
+    }
+}
+
 private val ThemeSeedOptions = listOf(
     0xFFFFFFFF,
     0xFFFEB4A7,
@@ -1708,5 +1771,12 @@ private fun ArabicFontFamily.label(): String {
         ArabicFontFamily.AMIRI -> "Amiri"
         ArabicFontFamily.NOTO_NASKH -> "Noto Naskh"
         ArabicFontFamily.SCHEHERAZADE -> "Scheherazade"
+    }
+}
+
+private fun CollectionTitleLanguage.label(): String {
+    return when (this) {
+        CollectionTitleLanguage.ENGLISH -> "English"
+        CollectionTitleLanguage.ARABIC -> "Arabic"
     }
 }

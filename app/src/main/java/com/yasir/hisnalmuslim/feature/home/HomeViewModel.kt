@@ -3,6 +3,7 @@ package com.yasir.hisnalmuslim.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.Immutable
+import com.yasir.hisnalmuslim.core.model.AppSettings
 import com.yasir.hisnalmuslim.core.model.Collection
 import com.yasir.hisnalmuslim.core.model.Dhikr
 import com.yasir.hisnalmuslim.core.util.TimeProvider
@@ -21,6 +22,7 @@ data class HomeUiState(
     val collections: List<Collection> = emptyList(),
     val dailyHighlight: Dhikr? = null,
     val canAdvanceDailyHighlight: Boolean = false,
+    val settings: AppSettings = AppSettings(),
 )
 
 @HiltViewModel
@@ -34,11 +36,13 @@ class HomeViewModel @Inject constructor(
         repository.observeCollections(),
         repository.observeAllDhikrOrdered(),
         settingsRepository.observeDailyReflectionOffset(),
-    ) { collections, allDhikr, dailyReflectionOffset ->
+        settingsRepository.observeSettings(),
+    ) { collections, allDhikr, dailyReflectionOffset, settings ->
         HomeUiState(
             collections = collections,
             dailyHighlight = resolveDailyHighlight(allDhikr, dailyReflectionOffset),
             canAdvanceDailyHighlight = allDhikr.size > 1,
+            settings = settings,
         )
     }.stateIn(
         scope = viewModelScope,

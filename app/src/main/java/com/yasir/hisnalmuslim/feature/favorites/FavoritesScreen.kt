@@ -58,7 +58,10 @@ import com.yasir.hisnalmuslim.core.designsystem.appTopBarColors
 import com.yasir.hisnalmuslim.core.designsystem.appTopBarContainerColor
 import com.yasir.hisnalmuslim.core.designsystem.groupedTileContainerColor
 import com.yasir.hisnalmuslim.core.designsystem.mergePaddingValues
+import com.yasir.hisnalmuslim.core.model.AppSettings
+import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.Dhikr
+import com.yasir.hisnalmuslim.core.model.displayCollectionTitle
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -68,7 +71,8 @@ fun FavoritesScreen(
     onOpenDhikr: (Dhikr) -> Unit,
     viewModel: FavoritesViewModel = hiltViewModel(),
 ) {
-    val favorites by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val favorites = uiState.favorites
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val layoutDirection = LocalLayoutDirection.current
     val topBarContainer = appTopBarContainerColor()
@@ -171,6 +175,7 @@ fun FavoritesScreen(
                         ) {
                             FavoriteDhikrTile(
                                 dhikr = item,
+                                settings = uiState.settings,
                                 shape = shape,
                                 onClick = { onOpenDhikr(item) },
                             )
@@ -255,9 +260,11 @@ private fun FavoriteDismissBackground(
 @Composable
 private fun FavoriteDhikrTile(
     dhikr: Dhikr,
+    settings: AppSettings,
     shape: RoundedCornerShape,
     onClick: () -> Unit,
 ) {
+    val arabicFont = LocalAppFonts.current.arabic
     Surface(
         color = groupedTileContainerColor(),
         shape = shape,
@@ -271,9 +278,14 @@ private fun FavoriteDhikrTile(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                text = dhikr.collectionTitle,
+                text = dhikr.displayCollectionTitle(settings),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                fontFamily = if (settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC) {
+                    arabicFont
+                } else {
+                    null
+                },
             )
             val subtitle = when {
                 dhikr.title.isNotBlank() && dhikr.title != dhikr.collectionTitle -> dhikr.title

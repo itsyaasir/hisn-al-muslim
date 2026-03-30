@@ -28,7 +28,7 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             seedImporter.importIfNeeded()
             dhikrRepository.observeCollections().first()
-            dhikrRepository.observeDailyHighlight().first()
+            dhikrRepository.observeAllDhikrOrdered().first()
             isReady.value = true
         }
     }

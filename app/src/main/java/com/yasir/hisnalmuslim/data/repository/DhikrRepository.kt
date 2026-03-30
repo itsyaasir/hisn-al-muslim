@@ -11,7 +11,6 @@ import com.yasir.hisnalmuslim.data.local.dao.ProgressDao
 import com.yasir.hisnalmuslim.data.local.entity.FavoriteEntity
 import com.yasir.hisnalmuslim.data.local.entity.ProgressEntity
 import com.yasir.hisnalmuslim.data.mapper.toModel
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -38,18 +37,6 @@ class DhikrRepository @Inject constructor(
 
     fun observeAllDhikrOrdered(): Flow<List<Dhikr>> {
         return dhikrDao.observeAllOrdered().map { items -> items.map { it.toModel() } }
-    }
-
-    fun observeDailyHighlight(): Flow<Dhikr?> {
-        return dhikrDao.observeAllOrdered().map { items ->
-            if (items.isEmpty()) {
-                null
-            } else {
-                val epochDay = TimeUnit.MILLISECONDS.toDays(timeProvider.now())
-                val dayIndex = (epochDay % items.size).toInt()
-                items[dayIndex].toModel()
-            }
-        }
     }
 
     fun searchDhikr(query: String): Flow<List<Dhikr>> {

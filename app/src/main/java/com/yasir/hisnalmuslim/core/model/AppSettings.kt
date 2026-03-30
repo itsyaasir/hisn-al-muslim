@@ -9,6 +9,7 @@ data class AppSettings(
     val pureBlackThemeEnabled: Boolean = false,
     val themeSeedColor: Long = DefaultThemeSeedColor,
     val fontScale: Float = 1.0f,
+    val collectionTitleLanguage: CollectionTitleLanguage = CollectionTitleLanguage.ENGLISH,
     val arabicFontFamily: ArabicFontFamily = ArabicFontFamily.AMIRI,
     val arabicFontScale: Float = 1.15f,
     val transliterationFontScale: Float = 1.0f,
@@ -22,6 +23,11 @@ enum class ArabicFontFamily {
     AMIRI,
     NOTO_NASKH,
     SCHEHERAZADE,
+}
+
+enum class CollectionTitleLanguage {
+    ENGLISH,
+    ARABIC,
 }
 
 const val DefaultThemeSeedColor: Long = 0xFFFFFFFFL

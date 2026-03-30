@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.yasir.hisnalmuslim.core.model.AppSettings
 import com.yasir.hisnalmuslim.core.model.ArabicFontFamily
+import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.DefaultThemeSeedColor
 import com.yasir.hisnalmuslim.core.model.ThemeMode
 import javax.inject.Inject
@@ -26,6 +27,9 @@ class SettingsRepository @Inject constructor(
                 pureBlackThemeEnabled = preferences[PURE_BLACK_THEME] ?: false,
                 themeSeedColor = preferences[THEME_SEED_COLOR] ?: DefaultThemeSeedColor,
                 fontScale = preferences[FONT_SCALE] ?: 1.0f,
+                collectionTitleLanguage = preferences[COLLECTION_TITLE_LANGUAGE]
+                    ?.let(CollectionTitleLanguage::valueOf)
+                    ?: CollectionTitleLanguage.ENGLISH,
                 arabicFontFamily = preferences[ARABIC_FONT_FAMILY]?.let(ArabicFontFamily::valueOf)
                     ?: ArabicFontFamily.AMIRI,
                 arabicFontScale = preferences[ARABIC_FONT_SCALE] ?: 1.15f,
@@ -56,6 +60,10 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setFontScale(scale: Float) {
         dataStore.edit { it[FONT_SCALE] = scale }
+    }
+
+    suspend fun setCollectionTitleLanguage(language: CollectionTitleLanguage) {
+        dataStore.edit { it[COLLECTION_TITLE_LANGUAGE] = language.name }
     }
 
     suspend fun setArabicFontFamily(fontFamily: ArabicFontFamily) {
@@ -104,6 +112,7 @@ class SettingsRepository @Inject constructor(
         val PURE_BLACK_THEME = booleanPreferencesKey("pure_black_theme")
         val THEME_SEED_COLOR = longPreferencesKey("theme_seed_color")
         val FONT_SCALE = floatPreferencesKey("font_scale")
+        val COLLECTION_TITLE_LANGUAGE = stringPreferencesKey("collection_title_language")
         val ARABIC_FONT_FAMILY = stringPreferencesKey("arabic_font_family")
         val ARABIC_FONT_SCALE = floatPreferencesKey("arabic_font_scale")
         val TRANSLITERATION_FONT_SCALE = floatPreferencesKey("transliteration_font_scale")

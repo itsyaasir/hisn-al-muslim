@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yasir.hisnalmuslim.core.model.AppSettings
 import com.yasir.hisnalmuslim.core.model.ArabicFontFamily
+import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.DefaultThemeSeedColor
 import com.yasir.hisnalmuslim.core.model.ThemeMode
 import com.yasir.hisnalmuslim.data.repository.DhikrRepository
@@ -53,6 +54,10 @@ class SettingsViewModel @Inject constructor(
 
     fun setFontScale(scale: Float) {
         viewModelScope.launch { repository.setFontScale(scale) }
+    }
+
+    fun setCollectionTitleLanguage(language: CollectionTitleLanguage) {
+        viewModelScope.launch { repository.setCollectionTitleLanguage(language) }
     }
 
     fun setArabicFontFamily(fontFamily: ArabicFontFamily) {

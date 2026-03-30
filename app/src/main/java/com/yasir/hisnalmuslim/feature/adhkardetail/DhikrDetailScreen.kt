@@ -88,7 +88,9 @@ import com.yasir.hisnalmuslim.core.designsystem.LocalAppFonts
 import com.yasir.hisnalmuslim.core.designsystem.LocalExpressiveShapes
 import com.yasir.hisnalmuslim.core.designsystem.LocalMotionPreferences
 import com.yasir.hisnalmuslim.core.designsystem.mergePaddingValues
+import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.Dhikr
+import com.yasir.hisnalmuslim.core.model.displayCollectionTitle
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -122,7 +124,12 @@ fun DhikrDetailScreen(
     val motionPreferences = LocalMotionPreferences.current
     val pagerState = rememberPagerState(pageCount = { uiState.collectionDhikr.size })
     val pageScrollStates = remember(uiState.collectionDhikr.size) { mutableStateMapOf<Int, ScrollState>() }
-    val headerTitle = uiState.dhikr?.collectionTitle.orEmpty()
+    val headerTitle = uiState.dhikr?.displayCollectionTitle(uiState.settings).orEmpty()
+    val headerTitleFont = if (uiState.settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC) {
+        arabicFont
+    } else {
+        topBarTitleFont
+    }
     val currentPageScroll = pageScrollStates[pagerState.currentPage]?.value ?: 0
     val collapseProgress by animateFloatAsState(
         targetValue = (currentPageScroll / 144f).coerceIn(0f, 1f),
@@ -183,7 +190,7 @@ fun DhikrDetailScreen(
             ) {
                 DetailScrollableHeader(
                     title = headerTitle,
-                    fontFamily = topBarTitleFont,
+                    fontFamily = headerTitleFont,
                     onBack = onBack,
                     isFavorite = uiState.isFavorite,
                     onToggleFavorite = { viewModel.toggleFavorite() },

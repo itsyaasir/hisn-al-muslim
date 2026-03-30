@@ -58,8 +58,11 @@ import com.yasir.hisnalmuslim.core.designsystem.appTopBarContainerColor
 import com.yasir.hisnalmuslim.core.designsystem.appTopBarColors
 import com.yasir.hisnalmuslim.core.designsystem.groupedTileContainerColor
 import com.yasir.hisnalmuslim.core.designsystem.mergePaddingValues
+import com.yasir.hisnalmuslim.core.model.AppSettings
 import com.yasir.hisnalmuslim.core.model.Collection
+import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.Dhikr
+import com.yasir.hisnalmuslim.core.model.displayTitle
 
 private val HomeTopRadius = 28.dp
 private val HomeInnerRadius = 8.dp
@@ -197,6 +200,7 @@ private fun HomeScreenContent(
                         item {
                             HomeCollectionGroup(
                                 items = uiState.collections,
+                                settings = uiState.settings,
                                 onOpenCollection = onOpenCollection,
                             )
                         }
@@ -306,12 +310,14 @@ private fun DailyReflectionTile(
 @Composable
 private fun HomeCollectionGroup(
     items: List<Collection>,
+    settings: AppSettings,
     onOpenCollection: (Collection) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         items.forEachIndexed { index, item ->
             HomeCollectionTile(
                 collection = item,
+                settings = settings,
                 shape = homeGroupShape(index, items.size),
                 onClick = { onOpenCollection(item) },
             )
@@ -322,9 +328,11 @@ private fun HomeCollectionGroup(
 @Composable
 private fun HomeCollectionTile(
     collection: Collection,
+    settings: AppSettings,
     shape: RoundedCornerShape,
     onClick: () -> Unit,
 ) {
+    val arabicFont = LocalAppFonts.current.arabic
     Surface(
         color = homeTileColor(),
         shape = shape,
@@ -345,9 +353,14 @@ private fun HomeCollectionTile(
                 verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
                 Text(
-                    text = collection.title,
+                    text = collection.displayTitle(settings),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
+                    fontFamily = if (settings.collectionTitleLanguage == CollectionTitleLanguage.ARABIC) {
+                        arabicFont
+                    } else {
+                        null
+                    },
                 )
             }
         }
