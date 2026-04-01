@@ -6,6 +6,8 @@ import com.yasir.hisnalmuslim.core.model.AppSettings
 import com.yasir.hisnalmuslim.core.model.ArabicFontFamily
 import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.DefaultThemeSeedColor
+import com.yasir.hisnalmuslim.core.model.RepeatableReminderPattern
+import com.yasir.hisnalmuslim.core.model.ReminderKind
 import com.yasir.hisnalmuslim.core.model.ThemeMode
 import com.yasir.hisnalmuslim.data.repository.DhikrRepository
 import com.yasir.hisnalmuslim.data.repository.SettingsRepository
@@ -92,40 +94,29 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { repository.setNotificationsEnabled(enabled) }
     }
 
-    fun setMorningReminderEnabled(enabled: Boolean) {
-        viewModelScope.launch { repository.setMorningReminderEnabled(enabled) }
+    fun setReminderEnabled(
+        kind: ReminderKind,
+        enabled: Boolean,
+    ) {
+        viewModelScope.launch { repository.setReminderEnabled(kind, enabled) }
     }
 
-    fun setMorningReminderMinutes(minutes: Int) {
-        viewModelScope.launch { repository.setMorningReminderMinutes(minutes) }
+    fun setReminderMinutes(
+        kind: ReminderKind,
+        minutes: Int,
+    ) {
+        viewModelScope.launch { repository.setReminderMinutes(kind, minutes) }
     }
 
-    fun setMorningReminderRingtoneUri(uri: String?) {
-        viewModelScope.launch { repository.setMorningReminderRingtoneUri(uri) }
+    fun setReminderRingtoneUri(
+        kind: ReminderKind,
+        uri: String?,
+    ) {
+        viewModelScope.launch { repository.setReminderRingtoneUri(kind, uri) }
     }
 
-    fun setEveningReminderEnabled(enabled: Boolean) {
-        viewModelScope.launch { repository.setEveningReminderEnabled(enabled) }
-    }
-
-    fun setEveningReminderMinutes(minutes: Int) {
-        viewModelScope.launch { repository.setEveningReminderMinutes(minutes) }
-    }
-
-    fun setEveningReminderRingtoneUri(uri: String?) {
-        viewModelScope.launch { repository.setEveningReminderRingtoneUri(uri) }
-    }
-
-    fun setSleepingReminderEnabled(enabled: Boolean) {
-        viewModelScope.launch { repository.setSleepingReminderEnabled(enabled) }
-    }
-
-    fun setSleepingReminderMinutes(minutes: Int) {
-        viewModelScope.launch { repository.setSleepingReminderMinutes(minutes) }
-    }
-
-    fun setSleepingReminderRingtoneUri(uri: String?) {
-        viewModelScope.launch { repository.setSleepingReminderRingtoneUri(uri) }
+    fun setRepeatableReminderPattern(pattern: RepeatableReminderPattern) {
+        viewModelScope.launch { repository.setRepeatableReminderPattern(pattern) }
     }
 
     fun clearFavorites() {

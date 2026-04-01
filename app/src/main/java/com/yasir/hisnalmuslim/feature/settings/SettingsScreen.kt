@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.LocaleConfig
 import android.app.LocaleManager
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.RingtoneManager
@@ -43,14 +44,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
+import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Hotel
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.NotificationsNone
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.AlertDialog
@@ -73,6 +80,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -94,8 +102,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yasir.hisnalmuslim.R
 import com.yasir.hisnalmuslim.core.designsystem.appTopBarContainerColor
@@ -108,6 +120,8 @@ import com.yasir.hisnalmuslim.core.model.ArabicFontFamily
 import com.yasir.hisnalmuslim.core.model.AppSettings
 import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.DefaultThemeSeedColor
+import com.yasir.hisnalmuslim.core.model.RepeatableReminderPattern
+import com.yasir.hisnalmuslim.core.model.ReminderKind
 import com.yasir.hisnalmuslim.core.model.ThemeMode
 import com.yasir.hisnalmuslim.core.designsystem.mergePaddingValues
 import kotlinx.coroutines.launch
@@ -119,12 +133,6 @@ private enum class SettingsPage {
     Reading,
     Notifications,
     About,
-}
-
-private enum class ReminderType {
-    MORNING,
-    EVENING,
-    SLEEPING,
 }
 
 private val TopGroupRadius = 28.dp
@@ -237,15 +245,10 @@ fun SettingsScreen(
             settings = settings,
             onBack = { navigateTo(SettingsPage.Main) },
             onNotificationsEnabledChange = viewModel::setNotificationsEnabled,
-            onMorningReminderEnabledChange = viewModel::setMorningReminderEnabled,
-            onMorningReminderMinutesChange = viewModel::setMorningReminderMinutes,
-            onMorningReminderRingtoneUriChange = viewModel::setMorningReminderRingtoneUri,
-            onEveningReminderEnabledChange = viewModel::setEveningReminderEnabled,
-            onEveningReminderMinutesChange = viewModel::setEveningReminderMinutes,
-            onEveningReminderRingtoneUriChange = viewModel::setEveningReminderRingtoneUri,
-            onSleepingReminderEnabledChange = viewModel::setSleepingReminderEnabled,
-            onSleepingReminderMinutesChange = viewModel::setSleepingReminderMinutes,
-            onSleepingReminderRingtoneUriChange = viewModel::setSleepingReminderRingtoneUri,
+            onReminderEnabledChange = viewModel::setReminderEnabled,
+            onReminderMinutesChange = viewModel::setReminderMinutes,
+            onReminderRingtoneUriChange = viewModel::setReminderRingtoneUri,
+            onRepeatableReminderPatternChange = viewModel::setRepeatableReminderPattern,
         )
 
         SettingsPage.About -> SettingsAboutPage(
@@ -313,7 +316,7 @@ private fun SettingsMainPage(
                 SettingsNavigationTile(
                     shape = settingsGroupShape(2, 3),
                     icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
-                    title = "Notifications",
+                    title = "Reminders",
                     subtitle = "Reminder preferences",
                     onClick = onOpenNotifications,
                 )
@@ -328,9 +331,11 @@ private fun SettingsMainPage(
                     SettingsNavigationTile(
                         shape = settingsGroupShape(0, 2),
                         icon = {
-                            SettingsPainterIcon(
-                                drawableRes = R.drawable.language,
+                            Icon(
+                                painter = painterResource(R.drawable.language),
+                                contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp),
                             )
                         },
                         title = "Language",
@@ -391,18 +396,19 @@ private fun SettingsNotificationsPage(
     settings: AppSettings,
     onBack: () -> Unit,
     onNotificationsEnabledChange: (Boolean) -> Unit,
-    onMorningReminderEnabledChange: (Boolean) -> Unit,
-    onMorningReminderMinutesChange: (Int) -> Unit,
-    onMorningReminderRingtoneUriChange: (String?) -> Unit,
-    onEveningReminderEnabledChange: (Boolean) -> Unit,
-    onEveningReminderMinutesChange: (Int) -> Unit,
-    onEveningReminderRingtoneUriChange: (String?) -> Unit,
-    onSleepingReminderEnabledChange: (Boolean) -> Unit,
-    onSleepingReminderMinutesChange: (Int) -> Unit,
-    onSleepingReminderRingtoneUriChange: (String?) -> Unit,
+    onReminderEnabledChange: (ReminderKind, Boolean) -> Unit,
+    onReminderMinutesChange: (ReminderKind, Int) -> Unit,
+    onReminderRingtoneUriChange: (ReminderKind, String?) -> Unit,
+    onRepeatableReminderPatternChange: (RepeatableReminderPattern) -> Unit,
 ) {
     val context = LocalContext.current
-    var ringtoneTarget by remember { mutableStateOf<ReminderType?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val notificationsEnabled = settings.notificationsEnabled
+    var systemNotificationsEnabled by remember(context) {
+        mutableStateOf(areSystemNotificationsEnabled(context))
+    }
+    var ringtoneTarget by remember { mutableStateOf<ReminderKind?>(null) }
+    var showRepeatablePatternSheet by rememberSaveable { mutableStateOf(false) }
     val ringtonePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) { result ->
@@ -412,11 +418,8 @@ private fun SettingsNotificationsPage(
         } else {
             null
         }
-        when (ringtoneTarget) {
-            ReminderType.MORNING -> onMorningReminderRingtoneUriChange(pickedUri?.toString())
-            ReminderType.EVENING -> onEveningReminderRingtoneUriChange(pickedUri?.toString())
-            ReminderType.SLEEPING -> onSleepingReminderRingtoneUriChange(pickedUri?.toString())
-            null -> Unit
+        ringtoneTarget?.let { target ->
+            onReminderRingtoneUriChange(target, pickedUri?.toString())
         }
         ringtoneTarget = null
     }
@@ -424,7 +427,22 @@ private fun SettingsNotificationsPage(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
         if (granted) {
+            systemNotificationsEnabled = true
             onNotificationsEnabledChange(true)
+        } else {
+            systemNotificationsEnabled = areSystemNotificationsEnabled(context)
+        }
+    }
+
+    DisposableEffect(context, lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                systemNotificationsEnabled = areSystemNotificationsEnabled(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
@@ -439,10 +457,24 @@ private fun SettingsNotificationsPage(
                 Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         if (hasPermission) {
+            systemNotificationsEnabled = true
             onNotificationsEnabledChange(true)
         } else {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+    }
+
+    fun openNotificationSettings() {
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            }
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
+        }
+        context.startActivity(intent)
     }
 
     fun pickReminderTime(currentMinutes: Int, onMinutesSelected: (Int) -> Unit) {
@@ -457,8 +489,8 @@ private fun SettingsNotificationsPage(
         ).show()
     }
 
-    fun pickReminderRingtone(type: ReminderType, existingUri: String?) {
-        ringtoneTarget = type
+    fun pickReminderRingtone(kind: ReminderKind, existingUri: String?) {
+        ringtoneTarget = kind
         val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
             putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
             putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
@@ -472,22 +504,39 @@ private fun SettingsNotificationsPage(
         ringtonePickerLauncher.launch(intent)
     }
 
+    if (showRepeatablePatternSheet) {
+        SettingsRepeatablePatternBottomSheet(
+            selectedPattern = settings.repeatableReminderPattern,
+            onPatternSelected = onRepeatableReminderPatternChange,
+            onDismiss = { showRepeatablePatternSheet = false },
+        )
+    }
+
     SettingsPageScaffold(
         contentPadding = contentPadding,
-        title = "Notifications",
+        title = "Reminders",
         subtitle = "Settings",
         onBack = onBack,
     ) {
         item { Spacer(Modifier.height(14.dp)) }
 
+        if (!systemNotificationsEnabled) {
+            item {
+                SettingsReminderPermissionNotice(
+                    onOpenSettings = ::openNotificationSettings,
+                )
+            }
+
+            item { Spacer(Modifier.height(12.dp)) }
+        }
+
         item {
             SettingsGroup {
                 SettingsSwitchTile(
                     shape = settingsGroupShape(0, 1),
-                    icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
-                    title = "Notifications",
-                    subtitle = "Turn reminders on or off.",
-                    checked = settings.notificationsEnabled,
+                    icon = { SettingsIcon(Icons.Outlined.NotificationsActive) },
+                    title = "Enable reminders",
+                    checked = notificationsEnabled,
                     onCheckedChange = ::requestNotificationsEnabled,
                 )
             }
@@ -500,16 +549,25 @@ private fun SettingsNotificationsPage(
         item { Spacer(Modifier.height(8.dp)) }
 
         item {
-            SettingsGroup {
-                SettingsReminderGroup(
-                    enabled = settings.morningReminderEnabled,
-                    timeLabel = formatReminderTime(context, settings.morningReminderMinutes),
-                    ringtoneLabel = reminderRingtoneLabel(context, settings.morningReminderRingtoneUri),
-                    onEnabledChange = onMorningReminderEnabledChange,
-                    onPickTime = { pickReminderTime(settings.morningReminderMinutes, onMorningReminderMinutesChange) },
-                    onPickRingtone = { pickReminderRingtone(ReminderType.MORNING, settings.morningReminderRingtoneUri) },
-                )
-            }
+            SettingsReminderGroup(
+                title = "Morning reminders",
+                description = "Start the day with remembrance.",
+                detailTitle = "Time",
+                enabledIcon = { SettingsIcon(Icons.Outlined.WbSunny) },
+                notificationsEnabled = notificationsEnabled,
+                enabled = settings.morningReminderEnabled,
+                detailLabel = formatReminderTime(context, settings.morningReminderMinutes),
+                ringtoneLabel = reminderRingtoneLabel(context, settings.morningReminderRingtoneUri),
+                onEnabledChange = { onReminderEnabledChange(ReminderKind.MORNING, it) },
+                onPickDetail = {
+                    pickReminderTime(settings.morningReminderMinutes) {
+                        onReminderMinutesChange(ReminderKind.MORNING, it)
+                    }
+                },
+                onPickRingtone = {
+                    pickReminderRingtone(ReminderKind.MORNING, settings.morningReminderRingtoneUri)
+                },
+            )
         }
 
         item { Spacer(Modifier.height(12.dp)) }
@@ -519,16 +577,25 @@ private fun SettingsNotificationsPage(
         item { Spacer(Modifier.height(8.dp)) }
 
         item {
-            SettingsGroup {
-                SettingsReminderGroup(
-                    enabled = settings.eveningReminderEnabled,
-                    timeLabel = formatReminderTime(context, settings.eveningReminderMinutes),
-                    ringtoneLabel = reminderRingtoneLabel(context, settings.eveningReminderRingtoneUri),
-                    onEnabledChange = onEveningReminderEnabledChange,
-                    onPickTime = { pickReminderTime(settings.eveningReminderMinutes, onEveningReminderMinutesChange) },
-                    onPickRingtone = { pickReminderRingtone(ReminderType.EVENING, settings.eveningReminderRingtoneUri) },
-                )
-            }
+            SettingsReminderGroup(
+                title = "Evening reminders",
+                description = "Wind down with remembrance.",
+                detailTitle = "Time",
+                enabledIcon = { SettingsIcon(Icons.Outlined.DarkMode) },
+                notificationsEnabled = notificationsEnabled,
+                enabled = settings.eveningReminderEnabled,
+                detailLabel = formatReminderTime(context, settings.eveningReminderMinutes),
+                ringtoneLabel = reminderRingtoneLabel(context, settings.eveningReminderRingtoneUri),
+                onEnabledChange = { onReminderEnabledChange(ReminderKind.EVENING, it) },
+                onPickDetail = {
+                    pickReminderTime(settings.eveningReminderMinutes) {
+                        onReminderMinutesChange(ReminderKind.EVENING, it)
+                    }
+                },
+                onPickRingtone = {
+                    pickReminderRingtone(ReminderKind.EVENING, settings.eveningReminderRingtoneUri)
+                },
+            )
         }
 
         item { Spacer(Modifier.height(12.dp)) }
@@ -538,16 +605,49 @@ private fun SettingsNotificationsPage(
         item { Spacer(Modifier.height(8.dp)) }
 
         item {
-            SettingsGroup {
-                SettingsReminderGroup(
-                    enabled = settings.sleepingReminderEnabled,
-                    timeLabel = formatReminderTime(context, settings.sleepingReminderMinutes),
-                    ringtoneLabel = reminderRingtoneLabel(context, settings.sleepingReminderRingtoneUri),
-                    onEnabledChange = onSleepingReminderEnabledChange,
-                    onPickTime = { pickReminderTime(settings.sleepingReminderMinutes, onSleepingReminderMinutesChange) },
-                    onPickRingtone = { pickReminderRingtone(ReminderType.SLEEPING, settings.sleepingReminderRingtoneUri) },
-                )
-            }
+            SettingsReminderGroup(
+                title = "Sleeping reminders",
+                description = "A calm reminder before sleep.",
+                detailTitle = "Time",
+                enabledIcon = { SettingsIcon(Icons.Outlined.Hotel) },
+                notificationsEnabled = notificationsEnabled,
+                enabled = settings.sleepingReminderEnabled,
+                detailLabel = formatReminderTime(context, settings.sleepingReminderMinutes),
+                ringtoneLabel = reminderRingtoneLabel(context, settings.sleepingReminderRingtoneUri),
+                onEnabledChange = { onReminderEnabledChange(ReminderKind.SLEEPING, it) },
+                onPickDetail = {
+                    pickReminderTime(settings.sleepingReminderMinutes) {
+                        onReminderMinutesChange(ReminderKind.SLEEPING, it)
+                    }
+                },
+                onPickRingtone = {
+                    pickReminderRingtone(ReminderKind.SLEEPING, settings.sleepingReminderRingtoneUri)
+                },
+            )
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        item { SettingsSectionLabel("Repeatable reminders") }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
+            SettingsRepeatableReminderGroup(
+                enabledIcon = { SettingsIcon(Icons.Outlined.Autorenew) },
+                notificationsEnabled = notificationsEnabled,
+                enabled = settings.repeatableReminderEnabled,
+                patternLabel = repeatableReminderPatternLabel(settings.repeatableReminderPattern),
+                ringtoneLabel = reminderRingtoneLabel(context, settings.repeatableReminderRingtoneUri),
+                onEnabledChange = { onReminderEnabledChange(ReminderKind.REPEATABLE, it) },
+                onPickPattern = { showRepeatablePatternSheet = true },
+                onPickRingtone = {
+                    pickReminderRingtone(
+                        ReminderKind.REPEATABLE,
+                        settings.repeatableReminderRingtoneUri,
+                    )
+                },
+            )
         }
 
         item { Spacer(Modifier.height(24.dp)) }
@@ -555,36 +655,209 @@ private fun SettingsNotificationsPage(
 }
 
 @Composable
+private fun SettingsReminderPermissionNotice(
+    onOpenSettings: () -> Unit,
+) {
+    SettingsStaticTile(shape = settingsGroupShape(0, 1)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 18.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.errorContainer,
+                shape = RoundedCornerShape(18.dp),
+                modifier = Modifier.size(48.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Outlined.NotificationsNone,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onErrorContainer,
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = "Notifications are off in system settings",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = "Turn them back on for Hisn Al-Muslim to receive reminders.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            TextButton(onClick = onOpenSettings) {
+                Text("Open settings")
+            }
+        }
+    }
+}
+
+@Composable
 private fun SettingsReminderGroup(
+    title: String,
+    description: String,
+    detailTitle: String,
+    enabledIcon: @Composable () -> Unit,
+    notificationsEnabled: Boolean,
     enabled: Boolean,
-    timeLabel: String,
+    detailLabel: String,
     ringtoneLabel: String,
     onEnabledChange: (Boolean) -> Unit,
-    onPickTime: () -> Unit,
+    onPickDetail: () -> Unit,
     onPickRingtone: () -> Unit,
 ) {
-    SettingsSwitchTile(
-        shape = settingsGroupShape(0, 3),
-        icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
-        title = "Enabled",
-        subtitle = "Turn this reminder on or off.",
-        checked = enabled,
-        onCheckedChange = onEnabledChange,
+    val controlsEnabled = notificationsEnabled && enabled
+    SettingsReminderCard(
+        title = title,
+        description = description,
+        enabledIcon = enabledIcon,
+        notificationsEnabled = notificationsEnabled,
+        enabled = enabled,
+        onEnabledChange = onEnabledChange,
+        primaryDetailTitle = detailTitle,
+        primaryDetailLabel = detailLabel,
+        onPickPrimaryDetail = onPickDetail,
+        secondaryDetailTitle = "Ringtone",
+        secondaryDetailLabel = ringtoneLabel,
+        onPickSecondaryDetail = onPickRingtone,
+        controlsEnabled = controlsEnabled,
     )
-    SettingsNavigationTile(
-        shape = settingsGroupShape(1, 3),
-        icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
-        title = "Time",
-        subtitle = timeLabel,
-        onClick = onPickTime,
+}
+
+@Composable
+private fun SettingsRepeatableReminderGroup(
+    enabledIcon: @Composable () -> Unit,
+    notificationsEnabled: Boolean,
+    enabled: Boolean,
+    patternLabel: String,
+    ringtoneLabel: String,
+    onEnabledChange: (Boolean) -> Unit,
+    onPickPattern: () -> Unit,
+    onPickRingtone: () -> Unit,
+) {
+    val controlsEnabled = notificationsEnabled && enabled
+    SettingsReminderCard(
+        title = "Repeatable reminders",
+        description = "Gentle nudges throughout the day.",
+        enabledIcon = enabledIcon,
+        notificationsEnabled = notificationsEnabled,
+        enabled = enabled,
+        onEnabledChange = onEnabledChange,
+        primaryDetailTitle = "Time pattern",
+        primaryDetailLabel = patternLabel,
+        onPickPrimaryDetail = onPickPattern,
+        secondaryDetailTitle = "Ringtone",
+        secondaryDetailLabel = ringtoneLabel,
+        onPickSecondaryDetail = onPickRingtone,
+        controlsEnabled = controlsEnabled,
     )
-    SettingsNavigationTile(
-        shape = settingsGroupShape(2, 3),
-        icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
-        title = "Ringtone",
-        subtitle = ringtoneLabel,
-        onClick = onPickRingtone,
-    )
+}
+
+@Composable
+private fun SettingsReminderCard(
+    title: String,
+    description: String,
+    enabledIcon: @Composable () -> Unit,
+    notificationsEnabled: Boolean,
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit,
+    primaryDetailTitle: String,
+    primaryDetailLabel: String,
+    onPickPrimaryDetail: () -> Unit,
+    secondaryDetailTitle: String,
+    secondaryDetailLabel: String,
+    onPickSecondaryDetail: () -> Unit,
+    controlsEnabled: Boolean,
+) {
+    SettingsStaticTile(shape = settingsGroupShape(0, 1)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(18.dp),
+                    modifier = Modifier.size(52.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        enabledIcon()
+                    }
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = enabled,
+                    enabled = notificationsEnabled,
+                    onCheckedChange = onEnabledChange,
+                    thumbContent = {
+                        if (enabled) {
+                            Icon(
+                                painter = painterResource(R.drawable.check),
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Outlined.Close,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        }
+                    },
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)),
+            )
+
+            SettingsCardNavigationRow(
+                icon = Icons.Outlined.Schedule,
+                title = primaryDetailTitle,
+                subtitle = primaryDetailLabel,
+                enabled = controlsEnabled,
+                onClick = onPickPrimaryDetail,
+            )
+            SettingsCardNavigationRow(
+                icon = Icons.Outlined.MusicNote,
+                title = secondaryDetailTitle,
+                subtitle = secondaryDetailLabel,
+                enabled = controlsEnabled,
+                onClick = onPickSecondaryDetail,
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -967,10 +1240,10 @@ private fun SettingsAboutPage(
 
     val socialLinks = remember {
         listOf(
-            AboutQuickLink(R.drawable.github, "GitHub", "https://example.com/github"),
-            AboutQuickLink(R.drawable.x, "X", "https://example.com/x"),
-            AboutQuickLink(R.drawable.globe, "Website", "https://example.com"),
-            AboutQuickLink(R.drawable.email, "Email", "mailto:hello@example.com"),
+            AboutQuickLink(R.drawable.github, "GitHub", "https://github.com/itsyaasir"),
+            AboutQuickLink(R.drawable.x, "X", "https://x.com/itsyaasir"),
+            AboutQuickLink(R.drawable.globe, "Website", "https://shariff.dev"),
+            AboutQuickLink(R.drawable.email, "Email", "mailto:contact@shariff.dev"),
         )
     }
 
@@ -988,8 +1261,7 @@ private fun SettingsAboutPage(
                     shape = settingsGroupShape(0, 2),
                     versionLabel = versionLabel,
                     versionCodeLabel = versionCodeLabel,
-                    onOpenDiscord = { uriHandler.openUri("https://example.com/discord") },
-                    onOpenRepository = { uriHandler.openUri("https://example.com/repository") },
+                    onOpenRepository = { uriHandler.openUri("https://github.com/itsyaasir/hisn-al-muslim") },
                 )
                 SettingsAboutDeveloperCard(
                     shape = settingsGroupShape(1, 2),
@@ -1004,7 +1276,7 @@ private fun SettingsAboutPage(
         item {
             SettingsGroup {
                 SettingsExternalLinkTile(
-                    shape = settingsGroupShape(0, 2),
+                    shape = settingsGroupShape(0, 1),
                     icon = {
                         SettingsPainterIcon(
                             drawableRes = R.drawable.bmc,
@@ -1014,18 +1286,6 @@ private fun SettingsAboutPage(
                     title = "Buy me a coffee",
                     subtitle = "Support the project with a small donation",
                     onClick = { uriHandler.openUri("https://example.com/buy-me-a-coffee") },
-                )
-                SettingsExternalLinkTile(
-                    shape = settingsGroupShape(1, 2),
-                    icon = {
-                        SettingsPainterIcon(
-                            drawableRes = R.drawable.weblate,
-                            tint = MaterialTheme.colorScheme.secondary,
-                        )
-                    },
-                    title = "Help translate Hisnul Muslim",
-                    subtitle = "Translate Hisnul Muslim into your language",
-                    onClick = { uriHandler.openUri("https://example.com/help-translate") },
                 )
             }
         }
@@ -1074,6 +1334,72 @@ private data class SettingsAppLocale(
     val locale: Locale,
     val name: String,
 )
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun SettingsRepeatablePatternBottomSheet(
+    selectedPattern: RepeatableReminderPattern,
+    onPatternSelected: (RepeatableReminderPattern) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    val bottomSheetState = rememberModalBottomSheetState()
+    val listState = rememberLazyListState()
+    val itemColors = ListItemDefaults.colors()
+    val itemShapes = ListItemDefaults.shapes()
+
+    fun selectPattern(pattern: RepeatableReminderPattern) {
+        scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
+            onPatternSelected(pattern)
+            onDismiss()
+        }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = bottomSheetState,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Choose time pattern",
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .clip(MaterialTheme.shapes.large),
+            ) {
+                itemsIndexed(
+                    RepeatableReminderPattern.entries,
+                    key = { _, item -> item.name },
+                ) { _, item ->
+                    val selected = item == selectedPattern
+
+                    SegmentedListItem(
+                        onClick = { selectPattern(item) },
+                        content = { Text(repeatableReminderPatternLabel(item)) },
+                        trailingContent = {
+                            if (selected) {
+                                Icon(
+                                    painter = painterResource(R.drawable.check),
+                                    contentDescription = "Selected",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        },
+                        selected = selected,
+                        shapes = itemShapes,
+                        colors = itemColors,
+                    )
+                }
+            }
+        }
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -1179,6 +1505,17 @@ private fun SettingsLocaleBottomSheet(
                 }
             }
         }
+    }
+}
+
+private fun repeatableReminderPatternLabel(pattern: RepeatableReminderPattern): String {
+    return when (pattern) {
+        RepeatableReminderPattern.EVERY_HOUR -> "Every hour"
+        RepeatableReminderPattern.EVERY_2_HOURS -> "Every 2 hours"
+        RepeatableReminderPattern.EVERY_4_HOURS -> "Every 4 hours"
+        RepeatableReminderPattern.EVERY_6_HOURS -> "Every 6 hours"
+        RepeatableReminderPattern.EVERY_8_HOURS -> "Every 8 hours"
+        RepeatableReminderPattern.EVERY_12_HOURS -> "Every 12 hours"
     }
 }
 
@@ -1305,9 +1642,11 @@ private fun SettingsNavigationTile(
     icon: @Composable () -> Unit,
     title: String,
     subtitle: String,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     SettingsSegmentedTile(
+        enabled = enabled,
         onClick = onClick,
         shape = shape,
         icon = icon,
@@ -1331,9 +1670,11 @@ private fun SettingsExternalLinkTile(
     icon: @Composable () -> Unit,
     title: String,
     subtitle: String,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     SettingsSegmentedTile(
+        enabled = enabled,
         onClick = onClick,
         shape = shape,
         icon = icon,
@@ -1356,11 +1697,13 @@ private fun SettingsSwitchTile(
     shape: RoundedCornerShape,
     icon: @Composable () -> Unit,
     title: String,
-    subtitle: String,
+    subtitle: String? = null,
     checked: Boolean,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     SettingsSegmentedTile(
+        enabled = enabled,
         onClick = { onCheckedChange(!checked) },
         shape = shape,
         icon = icon,
@@ -1369,6 +1712,7 @@ private fun SettingsSwitchTile(
         trailingContent = {
             Switch(
                 checked = checked,
+                enabled = enabled,
                 onCheckedChange = onCheckedChange,
                 thumbContent = {
                     if (checked) {
@@ -1393,14 +1737,16 @@ private fun SettingsSwitchTile(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SettingsSegmentedTile(
+    enabled: Boolean = true,
     onClick: () -> Unit,
     shape: RoundedCornerShape,
     icon: @Composable () -> Unit,
     title: String,
-    subtitle: String,
+    subtitle: String? = null,
     trailingContent: @Composable () -> Unit,
 ) {
     SegmentedListItem(
+        enabled = enabled,
         onClick = onClick,
         leadingContent = { icon() },
         content = {
@@ -1410,7 +1756,64 @@ private fun SettingsSegmentedTile(
                 fontWeight = FontWeight.Medium,
             )
         },
-        supportingContent = {
+        supportingContent = subtitle?.let {
+            {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        },
+        trailingContent = trailingContent,
+        colors = settingsListItemColors(),
+        shapes = settingsSegmentedListItemShapes(shape),
+    )
+}
+
+@Composable
+private fun SettingsCardNavigationRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    subtitle: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 2.dp)
+            .alpha(if (enabled) 1f else 0.56f),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+            shape = RoundedCornerShape(14.dp),
+            modifier = Modifier.size(42.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+            )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
@@ -1418,11 +1821,14 @@ private fun SettingsSegmentedTile(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-        },
-        trailingContent = trailingContent,
-        colors = settingsListItemColors(),
-        shapes = settingsSegmentedListItemShapes(shape),
-    )
+        }
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(18.dp),
+        )
+    }
 }
 
 @Composable
@@ -1699,7 +2105,6 @@ private fun SettingsAboutAppCard(
     shape: RoundedCornerShape,
     versionLabel: String,
     versionCodeLabel: String,
-    onOpenDiscord: () -> Unit,
     onOpenRepository: () -> Unit,
 ) {
     SettingsStaticTile(shape = shape) {
@@ -1734,7 +2139,7 @@ private fun SettingsAboutAppCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    text = "Hisnul Muslim",
+                    text = "Hisn Al-Muslim",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -1746,18 +2151,6 @@ private fun SettingsAboutAppCard(
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                FilledTonalIconButton(
-                    onClick = onOpenDiscord,
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    ),
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.discord),
-                        contentDescription = "Discord",
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
                 FilledTonalIconButton(
                     onClick = onOpenRepository,
                     colors = IconButtonDefaults.filledTonalIconButtonColors(
@@ -1810,12 +2203,12 @@ private fun SettingsAboutDeveloperCard(
                 Spacer(Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "Project maintainer",
+                        text = "Yasir Shariff",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = "Developer",
+                        text = " Software Engineer",
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.secondary,
                     )
@@ -2018,6 +2411,15 @@ private fun connectedChoiceShape(index: Int, count: Int): RoundedCornerShape {
 
         else -> RoundedCornerShape(10.dp)
     }
+}
+
+private fun areSystemNotificationsEnabled(context: Context): Boolean {
+    val permissionGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+    return permissionGranted && NotificationManagerCompat.from(context).areNotificationsEnabled()
 }
 
 private fun percentageLabel(value: Float): String {

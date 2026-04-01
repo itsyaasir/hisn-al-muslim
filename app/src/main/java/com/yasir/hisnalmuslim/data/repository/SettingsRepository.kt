@@ -12,6 +12,8 @@ import com.yasir.hisnalmuslim.core.model.AppSettings
 import com.yasir.hisnalmuslim.core.model.ArabicFontFamily
 import com.yasir.hisnalmuslim.core.model.CollectionTitleLanguage
 import com.yasir.hisnalmuslim.core.model.DefaultThemeSeedColor
+import com.yasir.hisnalmuslim.core.model.RepeatableReminderPattern
+import com.yasir.hisnalmuslim.core.model.ReminderKind
 import com.yasir.hisnalmuslim.core.model.ThemeMode
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +51,11 @@ class SettingsRepository @Inject constructor(
                 sleepingReminderEnabled = preferences[SLEEPING_REMINDER_ENABLED] ?: false,
                 sleepingReminderMinutes = preferences[SLEEPING_REMINDER_MINUTES] ?: 22 * 60,
                 sleepingReminderRingtoneUri = preferences[SLEEPING_REMINDER_RINGTONE_URI],
+                repeatableReminderEnabled = preferences[REPEATABLE_REMINDER_ENABLED] ?: false,
+                repeatableReminderPattern = preferences[REPEATABLE_REMINDER_PATTERN]
+                    ?.let(RepeatableReminderPattern::valueOf)
+                    ?: RepeatableReminderPattern.EVERY_4_HOURS,
+                repeatableReminderRingtoneUri = preferences[REPEATABLE_REMINDER_RINGTONE_URI],
             )
         }
     }
@@ -109,58 +116,38 @@ class SettingsRepository @Inject constructor(
         dataStore.edit { it[NOTIFICATIONS_ENABLED] = enabled }
     }
 
-    suspend fun setMorningReminderEnabled(enabled: Boolean) {
-        dataStore.edit { it[MORNING_REMINDER_ENABLED] = enabled }
+    suspend fun setReminderEnabled(
+        kind: ReminderKind,
+        enabled: Boolean,
+    ) {
+        dataStore.edit { it[reminderEnabledKey(kind)] = enabled }
     }
 
-    suspend fun setMorningReminderMinutes(minutes: Int) {
-        dataStore.edit { it[MORNING_REMINDER_MINUTES] = minutes }
+    suspend fun setReminderMinutes(
+        kind: ReminderKind,
+        minutes: Int,
+    ) {
+        require(kind != ReminderKind.REPEATABLE) {
+            "Repeatable reminders use a pattern instead of a fixed time"
+        }
+        dataStore.edit { it[reminderMinutesKey(kind)] = minutes }
     }
 
-    suspend fun setMorningReminderRingtoneUri(uri: String?) {
+    suspend fun setReminderRingtoneUri(
+        kind: ReminderKind,
+        uri: String?,
+    ) {
         dataStore.edit { preferences ->
             if (uri == null) {
-                preferences.remove(MORNING_REMINDER_RINGTONE_URI)
+                preferences.remove(reminderRingtoneKey(kind))
             } else {
-                preferences[MORNING_REMINDER_RINGTONE_URI] = uri
+                preferences[reminderRingtoneKey(kind)] = uri
             }
         }
     }
 
-    suspend fun setEveningReminderEnabled(enabled: Boolean) {
-        dataStore.edit { it[EVENING_REMINDER_ENABLED] = enabled }
-    }
-
-    suspend fun setEveningReminderMinutes(minutes: Int) {
-        dataStore.edit { it[EVENING_REMINDER_MINUTES] = minutes }
-    }
-
-    suspend fun setEveningReminderRingtoneUri(uri: String?) {
-        dataStore.edit { preferences ->
-            if (uri == null) {
-                preferences.remove(EVENING_REMINDER_RINGTONE_URI)
-            } else {
-                preferences[EVENING_REMINDER_RINGTONE_URI] = uri
-            }
-        }
-    }
-
-    suspend fun setSleepingReminderEnabled(enabled: Boolean) {
-        dataStore.edit { it[SLEEPING_REMINDER_ENABLED] = enabled }
-    }
-
-    suspend fun setSleepingReminderMinutes(minutes: Int) {
-        dataStore.edit { it[SLEEPING_REMINDER_MINUTES] = minutes }
-    }
-
-    suspend fun setSleepingReminderRingtoneUri(uri: String?) {
-        dataStore.edit { preferences ->
-            if (uri == null) {
-                preferences.remove(SLEEPING_REMINDER_RINGTONE_URI)
-            } else {
-                preferences[SLEEPING_REMINDER_RINGTONE_URI] = uri
-            }
-        }
+    suspend fun setRepeatableReminderPattern(pattern: RepeatableReminderPattern) {
+        dataStore.edit { it[REPEATABLE_REMINDER_PATTERN] = pattern.name }
     }
 
     fun observeNotificationPermissionPrompted(): Flow<Boolean> {
@@ -209,7 +196,31 @@ class SettingsRepository @Inject constructor(
         val SLEEPING_REMINDER_ENABLED = booleanPreferencesKey("sleeping_reminder_enabled")
         val SLEEPING_REMINDER_MINUTES = intPreferencesKey("sleeping_reminder_minutes")
         val SLEEPING_REMINDER_RINGTONE_URI = stringPreferencesKey("sleeping_reminder_ringtone_uri")
+        val REPEATABLE_REMINDER_ENABLED = booleanPreferencesKey("repeatable_reminder_enabled")
+        val REPEATABLE_REMINDER_PATTERN = stringPreferencesKey("repeatable_reminder_pattern")
+        val REPEATABLE_REMINDER_RINGTONE_URI = stringPreferencesKey("repeatable_reminder_ringtone_uri")
         val NOTIFICATION_PERMISSION_PROMPTED = booleanPreferencesKey("notification_permission_prompted")
         val DAILY_REFLECTION_OFFSET = longPreferencesKey("daily_reflection_offset")
+
+        fun reminderEnabledKey(kind: ReminderKind) = when (kind) {
+            ReminderKind.MORNING -> MORNING_REMINDER_ENABLED
+            ReminderKind.EVENING -> EVENING_REMINDER_ENABLED
+            ReminderKind.SLEEPING -> SLEEPING_REMINDER_ENABLED
+            ReminderKind.REPEATABLE -> REPEATABLE_REMINDER_ENABLED
+        }
+
+        fun reminderMinutesKey(kind: ReminderKind) = when (kind) {
+            ReminderKind.MORNING -> MORNING_REMINDER_MINUTES
+            ReminderKind.EVENING -> EVENING_REMINDER_MINUTES
+            ReminderKind.SLEEPING -> SLEEPING_REMINDER_MINUTES
+            ReminderKind.REPEATABLE -> error("Repeatable reminders do not store a fixed time")
+        }
+
+        fun reminderRingtoneKey(kind: ReminderKind) = when (kind) {
+            ReminderKind.MORNING -> MORNING_REMINDER_RINGTONE_URI
+            ReminderKind.EVENING -> EVENING_REMINDER_RINGTONE_URI
+            ReminderKind.SLEEPING -> SLEEPING_REMINDER_RINGTONE_URI
+            ReminderKind.REPEATABLE -> REPEATABLE_REMINDER_RINGTONE_URI
+        }
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -26,10 +27,13 @@ import com.yasir.hisnalmuslim.feature.favorites.FavoritesScreen
 import com.yasir.hisnalmuslim.feature.home.HomeScreen
 import com.yasir.hisnalmuslim.feature.search.SearchScreen
 import com.yasir.hisnalmuslim.feature.settings.SettingsScreen
+import com.yasir.hisnalmuslim.notifications.NotificationOpenTarget
 
 @Composable
 fun HisnulMuslimNavHost(
     modifier: Modifier = Modifier,
+    pendingNotificationTarget: NotificationOpenTarget? = null,
+    onPendingNotificationTargetConsumed: () -> Unit = {},
 ) {
     val activity = checkNotNull(LocalActivity.current)
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current)
@@ -42,6 +46,19 @@ fun HisnulMuslimNavHost(
         rememberSaveableStateHolderNavEntryDecorator<AppDestination>(),
         rememberViewModelStoreNavEntryDecorator<AppDestination>(viewModelStoreOwner),
     )
+
+    LaunchedEffect(pendingNotificationTarget) {
+        val target = pendingNotificationTarget ?: return@LaunchedEffect
+        backStack.clear()
+        backStack.add(AppDestination.Home)
+        backStack.add(
+            AppDestination.DhikrDetail(
+                dhikrId = target.dhikrId,
+                collectionId = target.collectionId,
+            ),
+        )
+        onPendingNotificationTargetConsumed()
+    }
 
     Scaffold(
         modifier = modifier,

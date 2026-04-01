@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Hisn Al-Muslim</string>
+    <string name="morning_reminder_channel_name">Morning remembrance</string>
+    <string name="morning_reminder_channel_description">Morning remembrance reminders</string>
+    <string name="evening_reminder_channel_name">Evening remembrance</string>
+    <string name="evening_reminder_channel_description">Evening remembrance reminders</string>
+    <string name="sleeping_reminder_channel_name">Sleeping remembrance</string>
+    <string name="sleeping_reminder_channel_description">Sleeping remembrance reminders</string>
+    <string name="repeatable_reminder_channel_name">Repeatable reminders</string>
+    <string name="repeatable_reminder_channel_description">Periodic adhkar reminders</string>
+    <string name="repeatable_reminder_notification_title">Adhkar reminder</string>
 </resources>

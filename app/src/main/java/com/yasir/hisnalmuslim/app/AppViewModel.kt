@@ -2,15 +2,17 @@ package com.yasir.hisnalmuslim.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yasir.hisnalmuslim.data.local.seed.SeedImporter
 import com.yasir.hisnalmuslim.data.repository.DhikrRepository
 import com.yasir.hisnalmuslim.data.repository.SettingsRepository
-import com.yasir.hisnalmuslim.data.local.seed.SeedImporter
+import com.yasir.hisnalmuslim.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -20,6 +22,7 @@ class AppViewModel @Inject constructor(
     private val dhikrRepository: DhikrRepository,
     seedImporter: SeedImporter,
     private val settingsRepository: SettingsRepository,
+    private val reminderScheduler: ReminderScheduler,
 ) : ViewModel() {
 
     private val isReady = MutableStateFlow(false)
@@ -29,6 +32,11 @@ class AppViewModel @Inject constructor(
             seedImporter.importIfNeeded()
             dhikrRepository.observeCollections().first()
             dhikrRepository.observeAllDhikrOrdered().first()
+            launch {
+                settingsRepository.observeSettings().collectLatest { settings ->
+                    reminderScheduler.syncAll(settings)
+                }
+            }
             isReady.value = true
         }
     }

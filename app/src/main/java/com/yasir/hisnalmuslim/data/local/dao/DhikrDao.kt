@@ -116,6 +116,34 @@ interface DhikrDao {
     @Query(
         """
         SELECT
+            grouped.collectionId AS id,
+            grouped.collectionTitle AS title,
+            grouped.collectionSubtitle AS subtitle,
+            grouped.collectionOrderIndex AS orderIndex,
+            (
+                SELECT innerAdhkar.id
+                FROM adhkar AS innerAdhkar
+                WHERE innerAdhkar.collectionId = grouped.collectionId
+                ORDER BY innerAdhkar.orderIndex, innerAdhkar.id
+                LIMIT 1
+            ) AS firstDhikrId,
+            COUNT(*) AS itemCount
+        FROM adhkar AS grouped
+        WHERE grouped.collectionId = :collectionId
+        GROUP BY
+            grouped.collectionId,
+            grouped.collectionTitle,
+            grouped.collectionSubtitle,
+            grouped.collectionOrderIndex
+        ORDER BY grouped.collectionTitle
+        LIMIT 1
+        """,
+    )
+    suspend fun getCollectionById(collectionId: Long): CollectionRow?
+
+    @Query(
+        """
+        SELECT
             adhkar.id,
             adhkar.collectionId,
             adhkar.collectionTitle,
@@ -136,6 +164,30 @@ interface DhikrDao {
         """,
     )
     fun observeCollectionDhikr(collectionId: Long): Flow<List<DhikrRow>>
+
+    @Query(
+        """
+        SELECT
+            adhkar.id,
+            adhkar.collectionId,
+            adhkar.collectionTitle,
+            adhkar.collectionSubtitle,
+            adhkar.collectionOrderIndex,
+            adhkar.title,
+            adhkar.arabicText,
+            adhkar.transliteration,
+            adhkar.translation,
+            adhkar.repeatCount,
+            adhkar.notes,
+            adhkar.sourceReference,
+            adhkar.orderIndex,
+            adhkar.tags
+        FROM adhkar
+        ORDER BY RANDOM()
+        LIMIT 1
+        """,
+    )
+    suspend fun getRandomDhikr(): DhikrRow?
 
     @Query("SELECT COUNT(*) FROM adhkar")
     suspend fun count(): Int

@@ -27,6 +27,14 @@ class DhikrRepository @Inject constructor(
         return dhikrDao.observeCollections().map { items -> items.map { it.toModel() } }
     }
 
+    suspend fun getCollectionById(collectionId: Long): Collection? {
+        return dhikrDao.getCollectionById(collectionId)?.toModel()
+    }
+
+    suspend fun getRandomDhikr(): Dhikr? {
+        return dhikrDao.getRandomDhikr()?.toModel()
+    }
+
     fun observeCollectionDhikr(collectionId: Long): Flow<List<Dhikr>> {
         return dhikrDao.observeCollectionDhikr(collectionId).map { items -> items.map { it.toModel() } }
     }

@@ -7,10 +7,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yasir.hisnalmuslim.core.designsystem.HisnulMuslimTheme
 import com.yasir.hisnalmuslim.navigation.HisnulMuslimNavHost
+import com.yasir.hisnalmuslim.notifications.NotificationOpenTarget
 
 @Composable
 fun HisnulMuslimRoot(
     appViewModel: AppViewModel = hiltViewModel(),
+    pendingNotificationTarget: NotificationOpenTarget? = null,
+    onPendingNotificationTargetConsumed: () -> Unit = {},
 ) {
     val uiState by appViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -18,7 +21,10 @@ fun HisnulMuslimRoot(
         settings = uiState.settings,
     ) {
         Surface {
-            HisnulMuslimNavHost()
+            HisnulMuslimNavHost(
+                pendingNotificationTarget = pendingNotificationTarget,
+                onPendingNotificationTargetConsumed = onPendingNotificationTargetConsumed,
+            )
         }
     }
 }
