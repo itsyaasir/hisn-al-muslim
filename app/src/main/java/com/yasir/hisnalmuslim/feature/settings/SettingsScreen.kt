@@ -1,10 +1,20 @@
 package com.yasir.hisnalmuslim.feature.settings
 
+import android.Manifest
 import android.app.LocaleConfig
 import android.app.LocaleManager
+import android.app.TimePickerDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
+import android.provider.Settings
+import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,6 +50,7 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.AlertDialog
@@ -83,6 +94,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yasir.hisnalmuslim.R
@@ -105,7 +117,14 @@ private enum class SettingsPage {
     Main,
     Appearance,
     Reading,
+    Notifications,
     About,
+}
+
+private enum class ReminderType {
+    MORNING,
+    EVENING,
+    SLEEPING,
 }
 
 private val TopGroupRadius = 28.dp
@@ -182,6 +201,7 @@ fun SettingsScreen(
             versionLabel = versionLabel,
             onOpenAppearance = { navigateTo(SettingsPage.Appearance) },
             onOpenReading = { navigateTo(SettingsPage.Reading) },
+            onOpenNotifications = { navigateTo(SettingsPage.Notifications) },
             onOpenLanguage = ::showLanguageSheet,
             onOpenAbout = { navigateTo(SettingsPage.About) },
             onResetFavorites = viewModel::clearFavorites,
@@ -212,6 +232,22 @@ fun SettingsScreen(
             onShowReferenceChange = viewModel::setShowReference,
         )
 
+        SettingsPage.Notifications -> SettingsNotificationsPage(
+            contentPadding = contentPadding,
+            settings = settings,
+            onBack = { navigateTo(SettingsPage.Main) },
+            onNotificationsEnabledChange = viewModel::setNotificationsEnabled,
+            onMorningReminderEnabledChange = viewModel::setMorningReminderEnabled,
+            onMorningReminderMinutesChange = viewModel::setMorningReminderMinutes,
+            onMorningReminderRingtoneUriChange = viewModel::setMorningReminderRingtoneUri,
+            onEveningReminderEnabledChange = viewModel::setEveningReminderEnabled,
+            onEveningReminderMinutesChange = viewModel::setEveningReminderMinutes,
+            onEveningReminderRingtoneUriChange = viewModel::setEveningReminderRingtoneUri,
+            onSleepingReminderEnabledChange = viewModel::setSleepingReminderEnabled,
+            onSleepingReminderMinutesChange = viewModel::setSleepingReminderMinutes,
+            onSleepingReminderRingtoneUriChange = viewModel::setSleepingReminderRingtoneUri,
+        )
+
         SettingsPage.About -> SettingsAboutPage(
             contentPadding = contentPadding,
             versionLabel = versionLabel,
@@ -229,6 +265,7 @@ private fun SettingsMainPage(
     versionLabel: String,
     onOpenAppearance: () -> Unit,
     onOpenReading: () -> Unit,
+    onOpenNotifications: () -> Unit,
     onOpenLanguage: () -> Unit,
     onOpenAbout: () -> Unit,
     onResetFavorites: () -> Unit,
@@ -260,18 +297,25 @@ private fun SettingsMainPage(
         item {
             SettingsGroup {
                 SettingsNavigationTile(
-                    shape = settingsGroupShape(0, 2),
+                    shape = settingsGroupShape(0, 3),
                     icon = { SettingsIcon(Icons.Outlined.Palette) },
                     title = "Appearance",
                     subtitle = "Theme, color scheme, black theme",
                     onClick = onOpenAppearance,
                 )
                 SettingsNavigationTile(
-                    shape = settingsGroupShape(1, 2),
+                    shape = settingsGroupShape(1, 3),
                     icon = { SettingsIcon(Icons.Outlined.TextFields) },
                     title = "Reading",
                     subtitle = "Fonts, transliteration, translation, reference",
                     onClick = onOpenReading,
+                )
+                SettingsNavigationTile(
+                    shape = settingsGroupShape(2, 3),
+                    icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
+                    title = "Notifications",
+                    subtitle = "Reminder preferences",
+                    onClick = onOpenNotifications,
                 )
             }
         }
@@ -339,6 +383,208 @@ private fun SettingsMainPage(
             },
         )
     }
+}
+
+@Composable
+private fun SettingsNotificationsPage(
+    contentPadding: PaddingValues,
+    settings: AppSettings,
+    onBack: () -> Unit,
+    onNotificationsEnabledChange: (Boolean) -> Unit,
+    onMorningReminderEnabledChange: (Boolean) -> Unit,
+    onMorningReminderMinutesChange: (Int) -> Unit,
+    onMorningReminderRingtoneUriChange: (String?) -> Unit,
+    onEveningReminderEnabledChange: (Boolean) -> Unit,
+    onEveningReminderMinutesChange: (Int) -> Unit,
+    onEveningReminderRingtoneUriChange: (String?) -> Unit,
+    onSleepingReminderEnabledChange: (Boolean) -> Unit,
+    onSleepingReminderMinutesChange: (Int) -> Unit,
+    onSleepingReminderRingtoneUriChange: (String?) -> Unit,
+) {
+    val context = LocalContext.current
+    var ringtoneTarget by remember { mutableStateOf<ReminderType?>(null) }
+    val ringtonePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        val pickedUri = if (result.resultCode == android.app.Activity.RESULT_OK) {
+            @Suppress("DEPRECATION")
+            result.data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+        } else {
+            null
+        }
+        when (ringtoneTarget) {
+            ReminderType.MORNING -> onMorningReminderRingtoneUriChange(pickedUri?.toString())
+            ReminderType.EVENING -> onEveningReminderRingtoneUriChange(pickedUri?.toString())
+            ReminderType.SLEEPING -> onSleepingReminderRingtoneUriChange(pickedUri?.toString())
+            null -> Unit
+        }
+        ringtoneTarget = null
+    }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            onNotificationsEnabledChange(true)
+        }
+    }
+
+    fun requestNotificationsEnabled(enabled: Boolean) {
+        if (!enabled) {
+            onNotificationsEnabledChange(false)
+            return
+        }
+        val hasPermission = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED
+        if (hasPermission) {
+            onNotificationsEnabledChange(true)
+        } else {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    fun pickReminderTime(currentMinutes: Int, onMinutesSelected: (Int) -> Unit) {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                onMinutesSelected((hourOfDay * 60) + minute)
+            },
+            currentMinutes / 60,
+            currentMinutes % 60,
+            DateFormat.is24HourFormat(context),
+        ).show()
+    }
+
+    fun pickReminderRingtone(type: ReminderType, existingUri: String?) {
+        ringtoneTarget = type
+        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, Settings.System.DEFAULT_NOTIFICATION_URI)
+            putExtra(
+                RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                existingUri?.let(Uri::parse) ?: Settings.System.DEFAULT_NOTIFICATION_URI,
+            )
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+        }
+        ringtonePickerLauncher.launch(intent)
+    }
+
+    SettingsPageScaffold(
+        contentPadding = contentPadding,
+        title = "Notifications",
+        subtitle = "Settings",
+        onBack = onBack,
+    ) {
+        item { Spacer(Modifier.height(14.dp)) }
+
+        item {
+            SettingsGroup {
+                SettingsSwitchTile(
+                    shape = settingsGroupShape(0, 1),
+                    icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
+                    title = "Notifications",
+                    subtitle = "Turn reminders on or off.",
+                    checked = settings.notificationsEnabled,
+                    onCheckedChange = ::requestNotificationsEnabled,
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        item { SettingsSectionLabel("Morning") }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
+            SettingsGroup {
+                SettingsReminderGroup(
+                    enabled = settings.morningReminderEnabled,
+                    timeLabel = formatReminderTime(context, settings.morningReminderMinutes),
+                    ringtoneLabel = reminderRingtoneLabel(context, settings.morningReminderRingtoneUri),
+                    onEnabledChange = onMorningReminderEnabledChange,
+                    onPickTime = { pickReminderTime(settings.morningReminderMinutes, onMorningReminderMinutesChange) },
+                    onPickRingtone = { pickReminderRingtone(ReminderType.MORNING, settings.morningReminderRingtoneUri) },
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        item { SettingsSectionLabel("Evening") }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
+            SettingsGroup {
+                SettingsReminderGroup(
+                    enabled = settings.eveningReminderEnabled,
+                    timeLabel = formatReminderTime(context, settings.eveningReminderMinutes),
+                    ringtoneLabel = reminderRingtoneLabel(context, settings.eveningReminderRingtoneUri),
+                    onEnabledChange = onEveningReminderEnabledChange,
+                    onPickTime = { pickReminderTime(settings.eveningReminderMinutes, onEveningReminderMinutesChange) },
+                    onPickRingtone = { pickReminderRingtone(ReminderType.EVENING, settings.eveningReminderRingtoneUri) },
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        item { SettingsSectionLabel("Sleeping") }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        item {
+            SettingsGroup {
+                SettingsReminderGroup(
+                    enabled = settings.sleepingReminderEnabled,
+                    timeLabel = formatReminderTime(context, settings.sleepingReminderMinutes),
+                    ringtoneLabel = reminderRingtoneLabel(context, settings.sleepingReminderRingtoneUri),
+                    onEnabledChange = onSleepingReminderEnabledChange,
+                    onPickTime = { pickReminderTime(settings.sleepingReminderMinutes, onSleepingReminderMinutesChange) },
+                    onPickRingtone = { pickReminderRingtone(ReminderType.SLEEPING, settings.sleepingReminderRingtoneUri) },
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(24.dp)) }
+    }
+}
+
+@Composable
+private fun SettingsReminderGroup(
+    enabled: Boolean,
+    timeLabel: String,
+    ringtoneLabel: String,
+    onEnabledChange: (Boolean) -> Unit,
+    onPickTime: () -> Unit,
+    onPickRingtone: () -> Unit,
+) {
+    SettingsSwitchTile(
+        shape = settingsGroupShape(0, 3),
+        icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
+        title = "Enabled",
+        subtitle = "Turn this reminder on or off.",
+        checked = enabled,
+        onCheckedChange = onEnabledChange,
+    )
+    SettingsNavigationTile(
+        shape = settingsGroupShape(1, 3),
+        icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
+        title = "Time",
+        subtitle = timeLabel,
+        onClick = onPickTime,
+    )
+    SettingsNavigationTile(
+        shape = settingsGroupShape(2, 3),
+        icon = { SettingsIcon(Icons.Outlined.NotificationsNone) },
+        title = "Ringtone",
+        subtitle = ringtoneLabel,
+        onClick = onPickRingtone,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -611,6 +857,28 @@ private fun SettingsSectionLabel(text: String) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 4.dp),
     )
+}
+
+private fun formatReminderTime(
+    context: android.content.Context,
+    minutes: Int,
+): String {
+    val hour = minutes / 60
+    val minute = minutes % 60
+    val calendar = java.util.Calendar.getInstance().apply {
+        set(java.util.Calendar.HOUR_OF_DAY, hour)
+        set(java.util.Calendar.MINUTE, minute)
+    }
+    return DateFormat.getTimeFormat(context).format(calendar.time)
+}
+
+private fun reminderRingtoneLabel(
+    context: android.content.Context,
+    ringtoneUri: String?,
+): String {
+    val uri = ringtoneUri?.let(Uri::parse) ?: Settings.System.DEFAULT_NOTIFICATION_URI
+    val ringtone = runCatching { RingtoneManager.getRingtone(context, uri) }.getOrNull()
+    return ringtone?.getTitle(context)?.takeIf { it.isNotBlank() } ?: "Default notification sound"
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)

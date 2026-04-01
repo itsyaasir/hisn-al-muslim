@@ -14,33 +14,31 @@ interface DhikrDao {
     @Query(
         """
         SELECT
-            adhkar.id,
-            adhkar.collectionId,
-            adhkar.collectionTitle,
-            adhkar.collectionSubtitle,
-            adhkar.collectionOrderIndex,
-            adhkar.title,
-            adhkar.arabicText,
-            adhkar.transliteration,
-            adhkar.translation,
-            adhkar.repeatCount,
-            adhkar.notes,
-            adhkar.sourceReference,
-            adhkar.orderIndex,
-            adhkar.tags
-        FROM adhkar
+            grouped.collectionId AS id,
+            grouped.collectionTitle AS title,
+            grouped.collectionSubtitle AS subtitle,
+            grouped.collectionOrderIndex AS orderIndex,
+            (
+                SELECT innerAdhkar.id
+                FROM adhkar AS innerAdhkar
+                WHERE innerAdhkar.collectionId = grouped.collectionId
+                ORDER BY innerAdhkar.orderIndex, innerAdhkar.id
+                LIMIT 1
+            ) AS firstDhikrId,
+            COUNT(*) AS itemCount
+        FROM adhkar AS grouped
         WHERE
-            adhkar.title LIKE '%' || :query || '%' COLLATE NOCASE OR
-            adhkar.arabicText LIKE '%' || :query || '%' OR
-            IFNULL(adhkar.transliteration, '') LIKE '%' || :query || '%' COLLATE NOCASE OR
-            IFNULL(adhkar.translation, '') LIKE '%' || :query || '%' COLLATE NOCASE OR
-            IFNULL(adhkar.notes, '') LIKE '%' || :query || '%' COLLATE NOCASE OR
-            IFNULL(adhkar.sourceReference, '') LIKE '%' || :query || '%' COLLATE NOCASE OR
-            IFNULL(adhkar.tags, '') LIKE '%' || :query || '%' COLLATE NOCASE
-        ORDER BY adhkar.orderIndex, adhkar.title
+            grouped.collectionTitle LIKE '%' || :query || '%' COLLATE NOCASE OR
+            IFNULL(grouped.collectionSubtitle, '') LIKE '%' || :query || '%'
+        GROUP BY
+            grouped.collectionId,
+            grouped.collectionTitle,
+            grouped.collectionSubtitle,
+            grouped.collectionOrderIndex
+        ORDER BY grouped.collectionOrderIndex, grouped.collectionTitle
         """,
     )
-    fun search(query: String): Flow<List<DhikrRow>>
+    fun searchCollections(query: String): Flow<List<CollectionRow>>
 
     @Query(
         """

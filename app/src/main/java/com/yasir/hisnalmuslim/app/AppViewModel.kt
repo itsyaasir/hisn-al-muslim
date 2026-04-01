@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 class AppViewModel @Inject constructor(
     private val dhikrRepository: DhikrRepository,
     seedImporter: SeedImporter,
-    settingsRepository: SettingsRepository,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val isReady = MutableStateFlow(false)
@@ -36,14 +36,20 @@ class AppViewModel @Inject constructor(
     val uiState: StateFlow<AppUiState> = combine(
         isReady,
         settingsRepository.observeSettings(),
-    ) { isReady, settings ->
+        settingsRepository.observeNotificationPermissionPrompted(),
+    ) { isReady, settings, notificationPermissionPrompted ->
         AppUiState(
             isReady = isReady,
             settings = settings,
+            shouldPromptNotificationPermission = isReady && !notificationPermissionPrompted,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = AppUiState(),
     )
+
+    fun markNotificationPermissionPrompted() {
+        viewModelScope.launch { settingsRepository.markNotificationPermissionPrompted() }
+    }
 }

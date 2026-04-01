@@ -109,12 +109,13 @@ fun HisnulMuslimNavHost(
                     entry<AppDestination.Search> { _ ->
                         SearchScreen(
                             contentPadding = innerPadding,
-                            onOpenDhikr = { dhikr ->
+                            onBack = { backStack.onBack(activity::finish) },
+                            onOpenCollection = { collection ->
                                 backStack.add(
                                     AppDestination.DhikrDetail(
-                                        dhikrId = dhikr.id,
-                                        collectionId = dhikr.collectionId,
-                                    ),
+                                        dhikrId = collection.firstDhikrId,
+                                        collectionId = collection.id,
+                                    )
                                 )
                             },
                         )

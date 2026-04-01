@@ -7,4 +7,5 @@ import com.yasir.hisnalmuslim.core.model.AppSettings
 data class AppUiState(
     val isReady: Boolean = false,
     val settings: AppSettings = AppSettings(),
+    val shouldPromptNotificationPermission: Boolean = false,
 )

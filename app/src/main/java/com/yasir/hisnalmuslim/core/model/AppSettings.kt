@@ -17,6 +17,16 @@ data class AppSettings(
     val showTransliteration: Boolean = true,
     val showTranslation: Boolean = true,
     val showReference: Boolean = true,
+    val notificationsEnabled: Boolean = false,
+    val morningReminderEnabled: Boolean = false,
+    val morningReminderMinutes: Int = 6 * 60,
+    val morningReminderRingtoneUri: String? = null,
+    val eveningReminderEnabled: Boolean = false,
+    val eveningReminderMinutes: Int = 18 * 60,
+    val eveningReminderRingtoneUri: String? = null,
+    val sleepingReminderEnabled: Boolean = false,
+    val sleepingReminderMinutes: Int = 22 * 60,
+    val sleepingReminderRingtoneUri: String? = null,
 )
 
 enum class ArabicFontFamily {

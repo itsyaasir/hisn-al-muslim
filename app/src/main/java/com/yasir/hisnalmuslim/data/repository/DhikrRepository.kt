@@ -39,12 +39,12 @@ class DhikrRepository @Inject constructor(
         return dhikrDao.observeAllOrdered().map { items -> items.map { it.toModel() } }
     }
 
-    fun searchDhikr(query: String): Flow<List<Dhikr>> {
+    fun searchCollections(query: String): Flow<List<Collection>> {
         val normalizedQuery = SearchQueryNormalizer.normalize(query)
         if (normalizedQuery.isBlank()) {
             return flowOf(emptyList())
         }
-        return dhikrDao.search(normalizedQuery).map { items -> items.map { it.toModel() } }
+        return dhikrDao.searchCollections(normalizedQuery).map { items -> items.map { it.toModel() } }
     }
 
     fun observeIsFavorite(dhikrId: Long): Flow<Boolean> {

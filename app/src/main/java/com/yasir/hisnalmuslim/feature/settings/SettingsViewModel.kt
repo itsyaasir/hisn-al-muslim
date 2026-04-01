@@ -88,6 +88,46 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { repository.setShowReference(visible) }
     }
 
+    fun setNotificationsEnabled(enabled: Boolean) {
+        viewModelScope.launch { repository.setNotificationsEnabled(enabled) }
+    }
+
+    fun setMorningReminderEnabled(enabled: Boolean) {
+        viewModelScope.launch { repository.setMorningReminderEnabled(enabled) }
+    }
+
+    fun setMorningReminderMinutes(minutes: Int) {
+        viewModelScope.launch { repository.setMorningReminderMinutes(minutes) }
+    }
+
+    fun setMorningReminderRingtoneUri(uri: String?) {
+        viewModelScope.launch { repository.setMorningReminderRingtoneUri(uri) }
+    }
+
+    fun setEveningReminderEnabled(enabled: Boolean) {
+        viewModelScope.launch { repository.setEveningReminderEnabled(enabled) }
+    }
+
+    fun setEveningReminderMinutes(minutes: Int) {
+        viewModelScope.launch { repository.setEveningReminderMinutes(minutes) }
+    }
+
+    fun setEveningReminderRingtoneUri(uri: String?) {
+        viewModelScope.launch { repository.setEveningReminderRingtoneUri(uri) }
+    }
+
+    fun setSleepingReminderEnabled(enabled: Boolean) {
+        viewModelScope.launch { repository.setSleepingReminderEnabled(enabled) }
+    }
+
+    fun setSleepingReminderMinutes(minutes: Int) {
+        viewModelScope.launch { repository.setSleepingReminderMinutes(minutes) }
+    }
+
+    fun setSleepingReminderRingtoneUri(uri: String?) {
+        viewModelScope.launch { repository.setSleepingReminderRingtoneUri(uri) }
+    }
+
     fun clearFavorites() {
         viewModelScope.launch { dhikrRepository.clearFavorites() }
     }

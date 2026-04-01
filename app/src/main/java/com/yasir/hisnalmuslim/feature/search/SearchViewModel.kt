@@ -3,8 +3,10 @@ package com.yasir.hisnalmuslim.feature.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.Immutable
-import com.yasir.hisnalmuslim.core.model.Dhikr
+import com.yasir.hisnalmuslim.core.model.AppSettings
+import com.yasir.hisnalmuslim.core.model.Collection
 import com.yasir.hisnalmuslim.data.repository.DhikrRepository
+import com.yasir.hisnalmuslim.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,23 +20,30 @@ import kotlinx.coroutines.flow.stateIn
 @Immutable
 data class SearchUiState(
     val query: String = "",
-    val results: List<Dhikr> = emptyList(),
+    val results: List<Collection> = emptyList(),
+    val settings: AppSettings = AppSettings(),
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     repository: DhikrRepository,
+    settingsRepository: SettingsRepository,
 ) : ViewModel() {
     private val query = MutableStateFlow("")
 
     private val results = query
-        .flatMapLatest(repository::searchDhikr)
+        .flatMapLatest(repository::searchCollections)
 
-    val uiState: StateFlow<SearchUiState> = combine(query, results) { currentQuery, items ->
+    val uiState: StateFlow<SearchUiState> = combine(
+        query,
+        results,
+        settingsRepository.observeSettings(),
+    ) { currentQuery, items, settings ->
         SearchUiState(
             query = currentQuery,
             results = items,
+            settings = settings,
         )
     }.stateIn(
         scope = viewModelScope,
