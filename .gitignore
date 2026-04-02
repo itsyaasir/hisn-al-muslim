@@ -62,3 +62,5 @@ replay_pid*
 .kotlin/
 
 .data/
+
+key.properties
