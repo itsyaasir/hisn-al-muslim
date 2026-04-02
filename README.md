@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="design/logo/hisn-al-muslim-logo.svg" alt="Hisn Al-Muslim logo" width="180">
+  <img src="design/logo/hisn-al-muslim-logo.png" alt="Hisn Al-Muslim logo" width="260">
 
 # Hisn Al-Muslim
 
