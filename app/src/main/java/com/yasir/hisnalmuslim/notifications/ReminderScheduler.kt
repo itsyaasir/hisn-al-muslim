@@ -6,7 +6,6 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.yasir.hisnalmuslim.R
 import com.yasir.hisnalmuslim.core.model.AppSettings
-import com.yasir.hisnalmuslim.core.model.Collection
 import com.yasir.hisnalmuslim.core.model.ReminderKind
 import com.yasir.hisnalmuslim.core.model.displayTitle
 import com.yasir.hisnalmuslim.core.model.reminderPreferences

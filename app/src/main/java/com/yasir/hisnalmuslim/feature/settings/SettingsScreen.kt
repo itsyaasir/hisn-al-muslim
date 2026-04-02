@@ -125,6 +125,7 @@ import com.yasir.hisnalmuslim.core.model.ReminderKind
 import com.yasir.hisnalmuslim.core.model.ThemeMode
 import com.yasir.hisnalmuslim.core.designsystem.mergePaddingValues
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Locale
 
 private enum class SettingsPage {
@@ -177,7 +178,7 @@ fun SettingsScreen(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.packageManager.getPackageInfo(
                     context.packageName,
-                    android.content.pm.PackageManager.PackageInfoFlags.of(0),
+                    PackageManager.PackageInfoFlags.of(0),
                 )
             } else {
                 @Suppress("DEPRECATION")
@@ -477,6 +478,14 @@ private fun SettingsNotificationsPage(
         context.startActivity(intent)
     }
 
+    fun openRepeatablePatternSheet() {
+        showRepeatablePatternSheet = true
+    }
+
+    fun dismissRepeatablePatternSheet() {
+        showRepeatablePatternSheet = false
+    }
+
     fun pickReminderTime(currentMinutes: Int, onMinutesSelected: (Int) -> Unit) {
         TimePickerDialog(
             context,
@@ -508,7 +517,7 @@ private fun SettingsNotificationsPage(
         SettingsRepeatablePatternBottomSheet(
             selectedPattern = settings.repeatableReminderPattern,
             onPatternSelected = onRepeatableReminderPatternChange,
-            onDismiss = { showRepeatablePatternSheet = false },
+            onDismiss = ::dismissRepeatablePatternSheet,
         )
     }
 
@@ -552,7 +561,6 @@ private fun SettingsNotificationsPage(
             SettingsReminderGroup(
                 title = "Morning reminders",
                 description = "Start the day with remembrance.",
-                detailTitle = "Time",
                 enabledIcon = { SettingsIcon(Icons.Outlined.WbSunny) },
                 notificationsEnabled = notificationsEnabled,
                 enabled = settings.morningReminderEnabled,
@@ -580,7 +588,6 @@ private fun SettingsNotificationsPage(
             SettingsReminderGroup(
                 title = "Evening reminders",
                 description = "Wind down with remembrance.",
-                detailTitle = "Time",
                 enabledIcon = { SettingsIcon(Icons.Outlined.DarkMode) },
                 notificationsEnabled = notificationsEnabled,
                 enabled = settings.eveningReminderEnabled,
@@ -608,7 +615,6 @@ private fun SettingsNotificationsPage(
             SettingsReminderGroup(
                 title = "Sleeping reminders",
                 description = "A calm reminder before sleep.",
-                detailTitle = "Time",
                 enabledIcon = { SettingsIcon(Icons.Outlined.Hotel) },
                 notificationsEnabled = notificationsEnabled,
                 enabled = settings.sleepingReminderEnabled,
@@ -640,7 +646,7 @@ private fun SettingsNotificationsPage(
                 patternLabel = repeatableReminderPatternLabel(settings.repeatableReminderPattern),
                 ringtoneLabel = reminderRingtoneLabel(context, settings.repeatableReminderRingtoneUri),
                 onEnabledChange = { onReminderEnabledChange(ReminderKind.REPEATABLE, it) },
-                onPickPattern = { showRepeatablePatternSheet = true },
+                onPickPattern = ::openRepeatablePatternSheet,
                 onPickRingtone = {
                     pickReminderRingtone(
                         ReminderKind.REPEATABLE,
@@ -705,7 +711,6 @@ private fun SettingsReminderPermissionNotice(
 private fun SettingsReminderGroup(
     title: String,
     description: String,
-    detailTitle: String,
     enabledIcon: @Composable () -> Unit,
     notificationsEnabled: Boolean,
     enabled: Boolean,
@@ -723,10 +728,9 @@ private fun SettingsReminderGroup(
         notificationsEnabled = notificationsEnabled,
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        primaryDetailTitle = detailTitle,
+        primaryDetailTitle = "Time",
         primaryDetailLabel = detailLabel,
         onPickPrimaryDetail = onPickDetail,
-        secondaryDetailTitle = "Ringtone",
         secondaryDetailLabel = ringtoneLabel,
         onPickSecondaryDetail = onPickRingtone,
         controlsEnabled = controlsEnabled,
@@ -755,7 +759,6 @@ private fun SettingsRepeatableReminderGroup(
         primaryDetailTitle = "Time pattern",
         primaryDetailLabel = patternLabel,
         onPickPrimaryDetail = onPickPattern,
-        secondaryDetailTitle = "Ringtone",
         secondaryDetailLabel = ringtoneLabel,
         onPickSecondaryDetail = onPickRingtone,
         controlsEnabled = controlsEnabled,
@@ -773,7 +776,6 @@ private fun SettingsReminderCard(
     primaryDetailTitle: String,
     primaryDetailLabel: String,
     onPickPrimaryDetail: () -> Unit,
-    secondaryDetailTitle: String,
     secondaryDetailLabel: String,
     onPickSecondaryDetail: () -> Unit,
     controlsEnabled: Boolean,
@@ -851,7 +853,7 @@ private fun SettingsReminderCard(
             )
             SettingsCardNavigationRow(
                 icon = Icons.Outlined.MusicNote,
-                title = secondaryDetailTitle,
+                title = "Ringtone",
                 subtitle = secondaryDetailLabel,
                 enabled = controlsEnabled,
                 onClick = onPickSecondaryDetail,
@@ -1133,20 +1135,20 @@ private fun SettingsSectionLabel(text: String) {
 }
 
 private fun formatReminderTime(
-    context: android.content.Context,
+    context: Context,
     minutes: Int,
 ): String {
     val hour = minutes / 60
     val minute = minutes % 60
-    val calendar = java.util.Calendar.getInstance().apply {
-        set(java.util.Calendar.HOUR_OF_DAY, hour)
-        set(java.util.Calendar.MINUTE, minute)
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, hour)
+        set(Calendar.MINUTE, minute)
     }
     return DateFormat.getTimeFormat(context).format(calendar.time)
 }
 
 private fun reminderRingtoneLabel(
-    context: android.content.Context,
+    context: Context,
     ringtoneUri: String?,
 ): String {
     val uri = ringtoneUri?.let(Uri::parse) ?: Settings.System.DEFAULT_NOTIFICATION_URI
@@ -1228,14 +1230,18 @@ private fun SettingsAboutPage(
     versionCodeLabel: String,
     onBack: () -> Unit,
 ) {
+    val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
-    var showLicenseDialog by rememberSaveable { mutableStateOf(false) }
+    val licenseText = remember(context) {
+        context.resources.openRawResource(R.raw.gpl_v3).bufferedReader().use { it.readText() }
+    }
+    var showLicenseSheet by rememberSaveable { mutableStateOf(false) }
     fun openLicenseDialog() {
-        showLicenseDialog = true
+        showLicenseSheet = true
     }
 
     fun dismissLicenseDialog() {
-        showLicenseDialog = false
+        showLicenseSheet = false
     }
 
     val socialLinks = remember {
@@ -1312,20 +1318,10 @@ private fun SettingsAboutPage(
         item { Spacer(Modifier.height(24.dp)) }
     }
 
-    if (showLicenseDialog) {
-        AlertDialog(
-            onDismissRequest = ::dismissLicenseDialog,
-            title = { Text("License") },
-            text = {
-                Text(
-                    "This app is currently configured with a placeholder GNU General Public License Version 3 notice. Replace this with the real project license text and links when you wire the final metadata.",
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = ::dismissLicenseDialog) {
-                    Text("Close")
-                }
-            },
+    if (showLicenseSheet) {
+        SettingsLicenseBottomSheet(
+            licenseText = licenseText,
+            onDismiss = ::dismissLicenseDialog,
         )
     }
 }
@@ -1334,6 +1330,57 @@ private data class SettingsAppLocale(
     val locale: Locale,
     val name: String,
 )
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsLicenseBottomSheet(
+    licenseText: String,
+    onDismiss: () -> Unit,
+) {
+    val bottomSheetState = rememberModalBottomSheetState()
+    val listState = rememberLazyListState()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = bottomSheetState,
+    ) {
+        LazyColumn(
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(horizontal = 20.dp),
+        ) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = "Hisn Al-Muslim",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = "Copyright (C) 2026 Yasir Shariff",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = "Licensed under the GNU General Public License v3.0 or later.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            item {
+                Text(
+                    text = licenseText,
+                    style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 22.sp),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
+            item { Spacer(Modifier.height(12.dp)) }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

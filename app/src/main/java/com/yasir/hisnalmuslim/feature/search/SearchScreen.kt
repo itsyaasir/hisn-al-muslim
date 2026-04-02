@@ -183,7 +183,7 @@ private fun SearchField(
             shape = RoundedCornerShape(SearchTopRadius),
             singleLine = true,
             leadingIcon = {
-                androidx.compose.material3.Icon(
+                Icon(
                     imageVector = Icons.Outlined.Search,
                     contentDescription = null,
                 )
