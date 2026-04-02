@@ -1,31 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:gravity="center"
-        android:width="88dp"
-        android:height="88dp">
-        <shape android:shape="oval">
-            <solid android:color="@color/icon_crescent_primary" />
-        </shape>
-    </item>
-
-    <item
-        android:left="40dp"
-        android:top="16dp"
-        android:right="8dp"
-        android:bottom="40dp">
-        <shape android:shape="oval">
-            <solid android:color="@color/icon_crescent_cutout" />
-        </shape>
-    </item>
-
-    <item
-        android:left="74dp"
-        android:top="34dp"
-        android:right="34dp"
-        android:bottom="74dp">
-        <shape android:shape="oval">
-            <solid android:color="@color/icon_star" />
-        </shape>
-    </item>
-</layer-list>
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center"
+    android:src="@drawable/ic_launcher_foreground_asset" />

@@ -58,6 +58,7 @@ import com.yasir.hisnalmuslim.core.designsystem.LocalMotionPreferences
 fun TopLevelFloatingNavigationBar(
     currentDestination: AppDestination?,
     onNavigate: (TopLevelDestination) -> Unit,
+    onReselect: (TopLevelDestination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val motionPreferences = LocalMotionPreferences.current
@@ -138,7 +139,7 @@ fun TopLevelFloatingNavigationBar(
                         ToggleButton(
                             checked = selected,
                             onCheckedChange = if (selected) {
-                                {}
+                                { onReselect(destination) }
                             } else {
                                 { onNavigate(destination) }
                             },

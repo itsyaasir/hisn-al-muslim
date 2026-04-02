@@ -11,7 +11,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -42,6 +45,7 @@ fun HisnulMuslimNavHost(
     val backStack = rememberNavBackStack(AppDestination.Home) as NavBackStack<AppDestination>
     val currentDestination = backStack.lastOrNull()
     val snackbarHostState = remember { SnackbarHostState() }
+    var settingsResetSignal by remember { mutableIntStateOf(0) }
     val entryDecorators = listOf<NavEntryDecorator<AppDestination>>(
         rememberSaveableStateHolderNavEntryDecorator<AppDestination>(),
         rememberViewModelStoreNavEntryDecorator<AppDestination>(viewModelStoreOwner),
@@ -70,6 +74,14 @@ fun HisnulMuslimNavHost(
                 currentDestination = currentDestination,
                 onNavigate = { destination ->
                     backStack.navigateToTopLevel(destination.destination)
+                },
+                onReselect = { destination ->
+                    when (destination.destination) {
+                        AppDestination.Settings -> settingsResetSignal++
+                        AppDestination.Home -> backStack.navigateToTopLevel(AppDestination.Home)
+                        AppDestination.Favorites -> backStack.navigateToTopLevel(AppDestination.Favorites)
+                        else -> Unit
+                    }
                 },
             )
         },
@@ -154,6 +166,7 @@ fun HisnulMuslimNavHost(
                     entry<AppDestination.Settings> { _ ->
                         SettingsScreen(
                             contentPadding = innerPadding,
+                            resetToMainSignal = settingsResetSignal,
                         )
                     }
                 },

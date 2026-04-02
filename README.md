@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="design/logo/hisn-al-muslim-logo.svg" alt="Hisn Al-Muslim logo" width="180">
 
 # Hisn Al-Muslim
 
@@ -6,74 +7,32 @@
 
 Hisn Al-Muslim is an offline-first Android app for reading and revisiting adhkar from *Hisnul Muslim*.
 
-Built with Jetpack Compose and Material 3, it focuses on calm reading, Arabic typography, collection-based navigation, and customizable reading settings.
+Built with Jetpack Compose and Material 3, it focuses on calm reading, Arabic typography, collection-based navigation, reminders, and customizable reading settings.
+
+</div>
+
+<div align="center">
+
+<a href="LICENSE">
+  <img src="https://img.shields.io/badge/license-GPL%20v3-blue?labelColor=1a1a1a&logo=gnu" alt="GPL v3 license">
+</a>
+<a href="./design/logo/hisn-al-muslim-logo.svg">
+  <img src="https://img.shields.io/badge/brand-Hisn%20Al--Muslim-c99c45?labelColor=1a1a1a" alt="Brand">
+</a>
 
 </div>
 
 ## Features
 
-- Collection-based home screen
+- Collection-based home screen for adhkar browsing
 - Swipeable dhikr reader inside each collection
-- Arabic font selection
-- Transliteration, translation, and reference controls
-- Favorites and search
+- Arabic font selection and reading controls
+- Transliteration, translation, and reference toggles
+- Favorites and collection-only search
+- Morning, evening, sleeping, and repeatable reminders
 - Dynamic color, black theme, and appearance settings
-- Offline bundled dataset
+- Offline bundled dataset with no runtime API dependency
 
-## Build
+## License
 
-### Debug
-
-```bash
-./gradlew :app:installDebug
-```
-
-Or:
-
-```bash
-./gradlew :app:assembleDebug
-```
-
-Debug APK output:
-
-`app/build/outputs/apk/debug/app-debug.apk`
-
-### Release
-
-```bash
-./gradlew :app:assembleRelease
-```
-
-Release APK output:
-
-`app/build/outputs/apk/release/app-release.apk`
-
-> [!NOTE]
-> Release installation requires proper signing configuration if you want to install it as a real release build.
-
-## Tech Stack
-
-- Kotlin
-- Jetpack Compose
-- Material 3
-- Room
-- DataStore
-- Hilt
-
-## Requirements
-
-- Android Studio with Android SDK
-- JDK 17
-- Android `minSdk 24`
-
-## Project Structure
-
-- `app/src/main/java/com/example/hisnulmuslim/app` - app shell and startup
-- `app/src/main/java/com/example/hisnulmuslim/feature` - screens and view models
-- `app/src/main/java/com/example/hisnulmuslim/data` - Room, seed import, repositories
-- `app/src/main/java/com/example/hisnulmuslim/core` - models, design system, utilities
-- `app/src/main/assets` - bundled seed dataset
-
-## Data
-
-The app ships with a local seed dataset and does not require a runtime API connection.
+This project is licensed under the GNU General Public License v3.0 or later.

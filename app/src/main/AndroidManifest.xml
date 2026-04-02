@@ -14,12 +14,12 @@
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HisnulMuslim"
+        android:theme="@style/Theme.HisnAlMuslim"
         tools:targetApi="tiramisu">
         <activity
             android:name=".app.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.HisnulMuslim">
+            android:theme="@style/Theme.HisnAlMuslim">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -56,6 +56,7 @@ import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.NotificationsNone
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -82,6 +83,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -145,6 +147,7 @@ private val PaneMaxWidth = 600.dp
 @Composable
 fun SettingsScreen(
     contentPadding: PaddingValues,
+    resetToMainSignal: Int = 0,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -153,6 +156,12 @@ fun SettingsScreen(
     var currentPage by rememberSaveable { mutableStateOf(SettingsPage.Main) }
     var showLocaleSheet by rememberSaveable { mutableStateOf(false) }
     val localeSelectorEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+    LaunchedEffect(resetToMainSignal) {
+        if (resetToMainSignal > 0) {
+            currentPage = SettingsPage.Main
+        }
+    }
 
     fun navigateTo(page: SettingsPage) {
         currentPage = page
@@ -2164,17 +2173,17 @@ private fun SettingsAboutAppCard(
         ) {
             Surface(
                 color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(22.dp),
+                shape = RoundedCornerShape(20.dp),
             ) {
                 Box(
                     modifier = Modifier
                         .size(64.dp)
-                        .padding(14.dp),
+                        .padding(6.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.MenuBook,
-                        contentDescription = null,
+                        painter = painterResource(R.drawable.ic_launcher_monochrome_asset),
+                        contentDescription = "Hisn Al-Muslim logo",
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.fillMaxSize(),
                     )
@@ -2240,7 +2249,7 @@ private fun SettingsAboutDeveloperCard(
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.pfp),
+                            imageVector = Icons.Outlined.Person,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.fillMaxSize(),
