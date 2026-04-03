@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yasir.hisnalmuslim.R
 import com.yasir.hisnalmuslim.core.designsystem.EmptyStateCard
 import com.yasir.hisnalmuslim.core.designsystem.HisnulMuslimTheme
 import com.yasir.hisnalmuslim.core.designsystem.LocalAppFonts
@@ -134,7 +136,7 @@ private fun HomeScreenContent(
                     modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
                     title = {
                         Text(
-                            text = "Hisnul Muslim",
+                            text = stringResource(R.string.app_name),
                             style = MaterialTheme.typography.headlineLarge.copy(
                                 fontSize = 32.sp,
                                 lineHeight = 32.sp,
@@ -267,21 +269,14 @@ private fun DailyReflectionTile(
                 }
             }
             Text(
-                text = dhikr.title,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontSize = (32 - (6 * collapseProgress)).sp,
-                    lineHeight = (36 - (6 * collapseProgress)).sp,
-                    fontWeight = FontWeight.SemiBold,
-                ),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                maxLines = if (collapseProgress > 0.7f) 1 else 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
                 text = dhikr.translation ?: dhikr.arabicText,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = (20 - (2 * collapseProgress)).sp,
+                    lineHeight = (28 - (4 * collapseProgress)).sp,
+                    fontWeight = FontWeight.Medium,
+                ),
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.84f),
-                maxLines = if (collapseProgress > 0.45f) 1 else 4,
+                maxLines = if (collapseProgress > 0.45f) 2 else 4,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.graphicsLayer {
                     alpha = 1f - (collapseProgress * 0.45f)

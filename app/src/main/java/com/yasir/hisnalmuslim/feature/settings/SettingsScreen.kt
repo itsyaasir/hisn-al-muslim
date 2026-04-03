@@ -100,6 +100,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -1265,7 +1266,7 @@ private fun SettingsAboutPage(
     SettingsPageScaffold(
         contentPadding = contentPadding,
         title = "About",
-        subtitle = "Hisnul Muslim",
+        subtitle = stringResource(R.string.app_name),
         onBack = onBack,
     ) {
         item { Spacer(Modifier.height(14.dp)) }
