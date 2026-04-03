@@ -1,0 +1,14 @@
+Alpha 1
+
+New:
+- Separate morning and evening collections
+- Morning, evening, sleeping, and repeatable reminders
+- Collection-only search
+- Arabic collection titles with RTL support
+- Reminder permission handling and notification settings
+
+Improvements:
+- Refined home, reading, and settings experience
+- Updated Arabic title rendering and typography
+- Improved About page and reminders UI
+- Updated branding, launcher icon, and release assets

@@ -1,26 +1,38 @@
 <div align="center">
-  <img src="design/logo/hisn-al-muslim-logo.png" alt="Hisn Al-Muslim logo" width="260">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Hisn Al-Muslim header" width="100%">
+
+  <br/>
+  <br/>
 
 # Hisn Al-Muslim
 
 ## About
 
-Hisn Al-Muslim is an offline-first Android app for reading and revisiting adhkar from *Hisnul Muslim*.
-
-Built with Jetpack Compose and Material 3, it focuses on calm reading, Arabic typography, collection-based navigation, reminders, and customizable reading settings.
+Hisn Al-Muslim is a calm Android app for reading, revisiting, and keeping close the daily adhkar from _Hisnul Muslim_.
 
 </div>
 
 <div align="center">
 
+<a href="https://github.com/itsyaasir/hisn-al-muslim/releases">
+  <img src="https://img.shields.io/github/v/release/itsyaasir/hisn-al-muslim?logo=github&labelColor=1a1a1a" alt="Latest release">
+</a>
 <a href="LICENSE">
   <img src="https://img.shields.io/badge/license-GPL%20v3-blue?labelColor=1a1a1a&logo=gnu" alt="GPL v3 license">
 </a>
-<a href="./design/logo/hisn-al-muslim-logo.svg">
-  <img src="https://img.shields.io/badge/brand-Hisn%20Al--Muslim-c99c45?labelColor=1a1a1a" alt="Brand">
-</a>
 
 </div>
+
+## Screenshots
+
+<p align="center" width="100%">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="24%">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="24%">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="24%">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="24%">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" width="24%">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7.png" width="24%">
+</p>
 
 ## Features
 
@@ -32,6 +44,10 @@ Built with Jetpack Compose and Material 3, it focuses on calm reading, Arabic ty
 - Morning, evening, sleeping, and repeatable reminders
 - Dynamic color, black theme, and appearance settings
 - Offline bundled dataset with no runtime API dependency
+
+## Download
+
+- **GitHub Releases**: Download the latest signed APK or app bundle from the [Releases](https://github.com/itsyaasir/hisn-al-muslim/releases/latest) page.
 
 ## License
 

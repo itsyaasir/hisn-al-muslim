@@ -1,0 +1,13 @@
+<i>Hisn Al-Muslim</i> is a calm Android app for reading, revisiting, and keeping close the daily adhkar from <i>Hisnul Muslim</i>.
+
+Built for a focused daily reading experience, it brings together clear collection browsing, comfortable Arabic reading, favorites, and gentle reminders throughout the day.
+
+<b>Features:</b>
+- Calm collection-based home screen for browsing adhkar
+- Swipeable dhikr reader for moving through each collection
+- Arabic font selection and reading controls
+- Transliteration, translation, and reference toggles
+- Favorites and collection-only search
+- Morning, evening, sleeping, and repeatable reminders
+- Dynamic color, black theme, and appearance settings
+- Works fully offline with a bundled dataset
